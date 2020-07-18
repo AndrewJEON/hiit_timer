@@ -7,6 +7,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  equatable: ^1.2.2
+  flutter_bloc: ^5.0.1
 
 dev_dependencies:
   flutter_test:

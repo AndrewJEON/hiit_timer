@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'bloc/timer_creating/timer_creating_bloc.dart';
+import 'presentation/pages/page_timer_creating.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -31,19 +35,19 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           FloatingActionButton(
+            heroTag: 'fast_rewind',
             mini: true,
             child: Icon(Icons.fast_rewind, size: 20),
-            onPressed: () {
-
-            },
+            onPressed: () {},
           ),
           FloatingActionButton(
+            heroTag: 'play_pause',
             child: AnimatedIcon(
               icon: AnimatedIcons.play_pause,
               progress: _controller,
             ),
             onPressed: () {
-              if(_controller.isCompleted) {
+              if (_controller.isCompleted) {
                 _controller.reverse();
               } else {
                 _controller.forward();
@@ -51,10 +55,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             },
           ),
           FloatingActionButton(
+            heroTag: 'fast_forward',
             mini: true,
             child: Icon(Icons.fast_forward, size: 20),
-            onPressed: () {
-            },
+            onPressed: () {},
           ),
         ],
       ),
@@ -71,7 +75,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               children: <Widget>[
                 IconButton(
                   icon: Icon(Icons.add),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BlocProvider(
+                          create: (context) => TimerCreatingBloc(),
+                          child: TimerCreatingPage(),
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 IconButton(
                   icon: Icon(Icons.settings),
