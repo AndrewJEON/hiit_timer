@@ -13,6 +13,16 @@ class TimerModel extends Equatable {
       : description = 'Work',
         duration = const Duration(seconds: 30);
 
+  TimerModel copyWith({
+    String description,
+    Duration duration,
+  }) {
+    return TimerModel(
+      description: description ?? this.description,
+      duration: duration ?? this.duration,
+    );
+  }
+
   @override
   List<Object> get props => [description, duration];
 }

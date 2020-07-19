@@ -22,13 +22,30 @@ class TimerCreatingPage extends StatelessWidget {
           children: <Widget>[
             Expanded(
               child: BlocBuilder<TimerCreatingBloc, TimerCreatingState>(
+                buildWhen: (previous, current) {
+                  if (previous.timerSets.length != current.timerSets.length) {
+                    return true;
+                  } else {
+                    var count = 0;
+                    for(var i = 0; i < previous.timerSets.length; i++) {
+                      if(previous.timerSets[i] != current.timerSets[i]) {
+                        count++;
+                        if(count >= 2) {
+                          return true;
+                        }
+                      }
+                    }
+                    return false;
+                  }
+                },
                 builder: (context, state) {
                   return ListView(
                     children: <Widget>[
                       for (var i = 0; i < state.timerSets.length; i++)
                         TimerSetView(
-                          key: ValueKey(i),
+                          key: UniqueKey(),
                           timerSet: state.timerSets[i],
+                          index: i,
                         ),
                     ],
                   );

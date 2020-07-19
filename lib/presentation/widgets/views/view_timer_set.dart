@@ -16,8 +16,13 @@ class TimerSetOptions {
 
 class TimerSetView extends StatelessWidget {
   final TimerSetModel timerSet;
+  final int index;
 
-  const TimerSetView({Key key, @required this.timerSet}) : super(key: key);
+  const TimerSetView({
+    Key key,
+    @required this.timerSet,
+    @required this.index,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +39,12 @@ class TimerSetView extends StatelessWidget {
           ),
           Divider(),
           for (var i = 0; i < timerSet.timers.length; i++)
-            TimerView(timer: timerSet.timers[i]),
+            TimerView(
+              key: UniqueKey(),
+              timer: timerSet.timers[i],
+              setIndex: index,
+              index: i,
+            ),
           SizedBox(
             width: double.infinity,
             child: FlatButton.icon(
@@ -74,7 +84,6 @@ class TimerSetView extends StatelessWidget {
           case TimerSetOptions.copy:
             break;
           case TimerSetOptions.delete:
-            final index = (key as ValueKey).value;
             context.bloc<TimerCreatingBloc>().add(TimerSetDeleted(index));
             break;
           case TimerSetOptions.moveUp:

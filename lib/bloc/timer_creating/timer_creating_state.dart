@@ -7,14 +7,6 @@ class TimerCreatingState extends Equatable {
 
   TimerCreatingState.initial() : timerSets = [TimerSetModel.initial()];
 
-  TimerCreatingState copyWith({
-    List<TimerSetModel> timerSets,
-  }) {
-    return TimerCreatingState(
-      timerSets: timerSets ?? List.of(this.timerSets),
-    );
-  }
-
   @override
   List<Object> get props => [...timerSets];
 }

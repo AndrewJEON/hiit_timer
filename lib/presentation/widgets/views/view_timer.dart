@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:interval_timer/bloc/timer_creating/timer_creating_bloc.dart';
 import 'package:meta/meta.dart';
 
 import '../../../data/models/model_timer.dart';
 
 class TimerView extends StatefulWidget {
   final TimerModel timer;
+  final int setIndex;
+  final int index;
 
-  const TimerView({Key key, @required this.timer}) : super(key: key);
+  const TimerView({
+    Key key,
+    @required this.timer,
+    @required this.setIndex,
+    @required this.index,
+  }) : super(key: key);
 
   @override
   _TimerViewState createState() => _TimerViewState();
@@ -41,6 +50,16 @@ class _TimerViewState extends State<TimerView> {
     return TextField(
       controller: _controller,
       maxLines: null,
+      textInputAction: TextInputAction.done,
+      onChanged: (value) {
+        context.bloc<TimerCreatingBloc>().add(
+              TimerDescriptionChanged(
+                description: value,
+                setIndex: widget.setIndex,
+                index: widget.index,
+              ),
+            );
+      },
     );
   }
 

@@ -17,3 +17,18 @@ class TimerSetDeleted extends TimerCreatingEvent {
   @override
   List<Object> get props => [index];
 }
+
+class TimerDescriptionChanged extends TimerCreatingEvent {
+  final String description;
+  final int setIndex;
+  final int index;
+
+  TimerDescriptionChanged({
+    this.description,
+    this.setIndex,
+    this.index,
+  });
+
+  @override
+  List<Object> get props => [description, setIndex, index];
+}
