@@ -23,6 +23,15 @@ class TimerModel extends Equatable {
     );
   }
 
+  TimerModel.fromJson(Map<String, dynamic> json)
+      : description = json['description'],
+        duration = Duration(seconds: json['duration']);
+
+  Map<String, dynamic> toJson() => {
+        'description': description,
+        'duration': duration.inSeconds,
+      };
+
   @override
   List<Object> get props => [description, duration];
 }

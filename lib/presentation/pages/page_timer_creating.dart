@@ -13,7 +13,10 @@ class TimerCreatingPage extends StatelessWidget {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.check),
-            onPressed: () {},
+            onPressed: () {
+              context.bloc<TimerCreatingBloc>().add(TimerSaved());
+              Navigator.pop(context);
+            },
           ),
         ],
       ),
@@ -27,10 +30,10 @@ class TimerCreatingPage extends StatelessWidget {
                     return true;
                   } else {
                     var count = 0;
-                    for(var i = 0; i < previous.timerSets.length; i++) {
-                      if(previous.timerSets[i] != current.timerSets[i]) {
+                    for (var i = 0; i < previous.timerSets.length; i++) {
+                      if (previous.timerSets[i] != current.timerSets[i]) {
                         count++;
-                        if(count >= 2) {
+                        if (count >= 2) {
                           return true;
                         }
                       }
@@ -43,7 +46,8 @@ class TimerCreatingPage extends StatelessWidget {
                     children: <Widget>[
                       for (var i = 0; i < state.timerSets.length; i++)
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 4),
                           child: TimerSetView(
                             key: UniqueKey(),
                             timerSet: state.timerSets[i],

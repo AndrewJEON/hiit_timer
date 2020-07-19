@@ -7,6 +7,8 @@ abstract class TimerCreatingEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class TimerSaved extends TimerCreatingEvent {}
+
 class TimerSetAdded extends TimerCreatingEvent {}
 
 class TimerSetCopied extends TimerCreatingEvent {

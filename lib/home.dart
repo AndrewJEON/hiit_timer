@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'bloc/timer_creating/timer_creating_bloc.dart';
+import 'core/service_locator.dart';
+import 'data/repositories/repository_timer.dart';
 import 'presentation/pages/page_timer_creating.dart';
 
 class Home extends StatefulWidget {
@@ -30,6 +32,18 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      body: Center(
+        child: FutureBuilder<TimerCreatingState>(
+          future: sl<TimerRepository>().load(),
+          builder: (context, snapshot) {
+            if(snapshot.hasData) {
+              return Text(snapshot.data.toString());
+            } else {
+              return CircularProgressIndicator();
+            }
+          },
+        ),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Row(
         mainAxisSize: MainAxisSize.min,
@@ -80,7 +94,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       context,
                       MaterialPageRoute(
                         builder: (context) => BlocProvider(
-                          create: (context) => TimerCreatingBloc(),
+                          create: (context) => TimerCreatingBloc(
+                            sl<TimerRepository>(),
+                          ),
                           child: TimerCreatingPage(),
                         ),
                       ),

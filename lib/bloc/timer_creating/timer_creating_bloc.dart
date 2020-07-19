@@ -5,18 +5,23 @@ import 'package:equatable/equatable.dart';
 
 import '../../data/models/model_timer.dart';
 import '../../data/models/model_timer_set.dart';
+import '../../data/repositories/repository_timer.dart';
 
 part 'timer_creating_event.dart';
 part 'timer_creating_state.dart';
 
 class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerCreatingState> {
-  TimerCreatingBloc() : super(TimerCreatingState.initial());
+  final TimerRepository repository;
+
+  TimerCreatingBloc(this.repository) : super(TimerCreatingState.initial());
 
   @override
   Stream<TimerCreatingState> mapEventToState(
     TimerCreatingEvent event,
   ) async* {
-    if (event is TimerSetAdded) {
+    if (event is TimerSaved) {
+      await repository.save(state);
+    } else if (event is TimerSetAdded) {
       yield* _mapTimerSetAddedToState(event);
     } else if (event is TimerSetCopied) {
       yield* _mapTimerSetCopiedToState(event);

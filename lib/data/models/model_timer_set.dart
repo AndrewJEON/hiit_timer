@@ -25,6 +25,16 @@ class TimerSetModel extends Equatable {
     );
   }
 
+  TimerSetModel.fromJson(Map<String, dynamic> json)
+      : timers =
+            json['timers'].map((timer) => TimerModel.fromJson(timer)).toList().cast<TimerModel>(),
+        repeatCount = json['repeatCount'];
+
+  Map<String, dynamic> toJson() => {
+        'timers': timers.map((timer) => timer.toJson()).toList(),
+        'repeatCount': repeatCount,
+      };
+
   @override
   List<Object> get props => [...timers, repeatCount];
 }
