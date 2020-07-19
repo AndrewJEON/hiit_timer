@@ -63,6 +63,15 @@ class TimerSetRepeatCountDecreased extends TimerCreatingEvent {
   List<Object> get props => [index];
 }
 
+class TimerAdded extends TimerCreatingEvent {
+  final int index;
+
+  TimerAdded(this.index);
+
+  @override
+  List<Object> get props => [index];
+}
+
 class TimerDescriptionChanged extends TimerCreatingEvent {
   final String description;
   final int setIndex;

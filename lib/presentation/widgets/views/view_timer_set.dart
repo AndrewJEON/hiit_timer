@@ -38,17 +38,48 @@ class TimerSetView extends StatelessWidget {
             ],
           ),
           Divider(),
-          for (var i = 0; i < timerSet.timers.length; i++)
-            TimerView(
-              key: UniqueKey(),
-              timer: timerSet.timers[i],
-              setIndex: index,
-              index: i,
-            ),
+          BlocBuilder<TimerCreatingBloc, TimerCreatingState>(
+            buildWhen: (previous, current) {
+              if (previous.timerSets[index].timers.length !=
+                  current.timerSets[index].timers.length) {
+                return true;
+              } else {
+                var count = 0;
+                for (var i = 0;
+                    i < previous.timerSets[index].timers.length;
+                    i++) {
+                  if (previous.timerSets[index].timers[i] !=
+                      current.timerSets[index].timers[i]) {
+                    count++;
+                    if (count >= 2) {
+                      return true;
+                    }
+                  }
+                }
+                return false;
+              }
+            },
+            builder: (context, state) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  for (var i = 0; i < state.timerSets[index].timers.length; i++)
+                    TimerView(
+                      key: UniqueKey(),
+                      timer: state.timerSets[index].timers[i],
+                      setIndex: index,
+                      index: i,
+                    ),
+                ],
+              );
+            },
+          ),
           SizedBox(
             width: double.infinity,
             child: FlatButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                context.bloc<TimerCreatingBloc>().add(TimerAdded(index));
+              },
               icon: Icon(Icons.add),
               label: Text('Add'),
             ),
