@@ -82,6 +82,7 @@ class TimerSetView extends StatelessWidget {
       onSelected: (value) {
         switch (value) {
           case TimerSetOptions.copy:
+            context.bloc<TimerCreatingBloc>().add(TimerSetCopied(index));
             break;
           case TimerSetOptions.delete:
             context.bloc<TimerCreatingBloc>().add(TimerSetDeleted(index));

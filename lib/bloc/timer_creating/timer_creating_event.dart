@@ -9,6 +9,15 @@ abstract class TimerCreatingEvent extends Equatable {
 
 class TimerSetAdded extends TimerCreatingEvent {}
 
+class TimerSetCopied extends TimerCreatingEvent {
+  final int index;
+
+  TimerSetCopied(this.index);
+
+  @override
+  List<Object> get props => [index];
+}
+
 class TimerSetDeleted extends TimerCreatingEvent {
   final int index;
 

@@ -18,6 +18,8 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerCreatingState> {
   ) async* {
     if (event is TimerSetAdded) {
       yield* _mapTimerSetAddedToState(event);
+    } else if (event is TimerSetCopied) {
+      yield* _mapTimerSetCopiedToState(event);
     } else if (event is TimerSetDeleted) {
       yield* _mapTimerSetDeletedToState(event);
     } else if (event is TimerDescriptionChanged) {
@@ -30,6 +32,15 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerCreatingState> {
   ) async* {
     yield TimerCreatingState(
       timerSets: List.of(state.timerSets)..add(TimerSetModel.initial()),
+    );
+  }
+
+  Stream<TimerCreatingState> _mapTimerSetCopiedToState(
+    TimerSetCopied event,
+  ) async* {
+    yield TimerCreatingState(
+      timerSets: List.of(state.timerSets)
+        ..insert(event.index, state.timerSets[event.index]),
     );
   }
 
