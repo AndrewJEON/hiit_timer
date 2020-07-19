@@ -72,6 +72,58 @@ class TimerAdded extends TimerCreatingEvent {
   List<Object> get props => [index];
 }
 
+class TimerCopied extends TimerCreatingEvent {
+  final int setIndex;
+  final int index;
+
+  TimerCopied({
+    this.setIndex,
+    this.index,
+  });
+
+  @override
+  List<Object> get props => [setIndex, index];
+}
+
+class TimerDeleted extends TimerCreatingEvent {
+  final int setIndex;
+  final int index;
+
+  TimerDeleted({
+    this.setIndex,
+    this.index,
+  });
+
+  @override
+  List<Object> get props => [setIndex, index];
+}
+
+class TimerMovedUp extends TimerCreatingEvent {
+  final int setIndex;
+  final int index;
+
+  TimerMovedUp({
+    this.setIndex,
+    this.index,
+  });
+
+  @override
+  List<Object> get props => [setIndex, index];
+}
+
+class TimerMovedDown extends TimerCreatingEvent {
+  final int setIndex;
+  final int index;
+
+  TimerMovedDown({
+    this.setIndex,
+    this.index,
+  });
+
+  @override
+  List<Object> get props => [setIndex, index];
+}
+
 class TimerDurationChanged extends TimerCreatingEvent {
   final Duration duration;
   final int setIndex;

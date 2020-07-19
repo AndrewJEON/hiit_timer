@@ -32,7 +32,15 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerCreatingState> {
       yield* _mapTimerSetRepeatCountDecreasedToState(event);
     } else if (event is TimerAdded) {
       yield* _mapTimerAddedToState(event);
-    }else if (event is TimerDurationChanged) {
+    } else if (event is TimerCopied) {
+      yield* _mapTimerCopiedToState(event);
+    } else if (event is TimerDeleted) {
+      yield* _mapTimerDeletedToState(event);
+    } else if (event is TimerMovedUp) {
+      yield* _mapTimerMovedUpToState(event);
+    } else if (event is TimerMovedDown) {
+      yield* _mapTimerMovedDownToState(event);
+    } else if (event is TimerDurationChanged) {
       yield* _mapTimerDurationChangedToState(event);
     } else if (event is TimerDescriptionChanged) {
       yield* _mapTimerDescriptionChangedToState(event);
@@ -131,9 +139,76 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerCreatingState> {
     );
   }
 
+  Stream<TimerCreatingState> _mapTimerCopiedToState(
+    TimerCopied event,
+  ) async* {
+    final newTimerSet = state.timerSets[event.setIndex].copyWith(
+      timers: List.of(state.timerSets[event.setIndex].timers)
+        ..insert(
+          event.index,
+          state.timerSets[event.setIndex].timers[event.index],
+        ),
+    );
+    yield TimerCreatingState(
+      timerSets: List.of(state.timerSets)
+        ..removeAt(event.setIndex)
+        ..insert(event.setIndex, newTimerSet),
+    );
+  }
+
+  Stream<TimerCreatingState> _mapTimerDeletedToState(
+    TimerDeleted event,
+  ) async* {
+    final newTimerSet = state.timerSets[event.setIndex].copyWith(
+      timers: List.of(state.timerSets[event.setIndex].timers)
+        ..removeAt(event.index),
+    );
+    yield TimerCreatingState(
+      timerSets: List.of(state.timerSets)
+        ..removeAt(event.setIndex)
+        ..insert(event.setIndex, newTimerSet),
+    );
+  }
+
+  Stream<TimerCreatingState> _mapTimerMovedUpToState(
+    TimerMovedUp event,
+  ) async* {
+    if (event.index > 0) {
+      final target = state.timerSets[event.setIndex].timers[event.index];
+      final newTimerSet = state.timerSets[event.setIndex].copyWith(
+        timers: List.of(state.timerSets[event.setIndex].timers)
+          ..removeAt(event.index)
+          ..insert(event.index - 1, target),
+      );
+      yield TimerCreatingState(
+        timerSets: List.of(state.timerSets)
+          ..removeAt(event.setIndex)
+          ..insert(event.setIndex, newTimerSet),
+      );
+    }
+  }
+
+  Stream<TimerCreatingState> _mapTimerMovedDownToState(
+    TimerMovedDown event,
+  ) async* {
+    if (event.index < state.timerSets.length - 1) {
+      final target = state.timerSets[event.setIndex].timers[event.index];
+      final newTimerSet = state.timerSets[event.setIndex].copyWith(
+        timers: List.of(state.timerSets[event.setIndex].timers)
+          ..removeAt(event.index)
+          ..insert(event.index + 1, target),
+      );
+      yield TimerCreatingState(
+        timerSets: List.of(state.timerSets)
+          ..removeAt(event.setIndex)
+          ..insert(event.setIndex, newTimerSet),
+      );
+    }
+  }
+
   Stream<TimerCreatingState> _mapTimerDurationChangedToState(
-      TimerDurationChanged event,
-      ) async* {
+    TimerDurationChanged event,
+  ) async* {
     final newTimer = state.timerSets[event.setIndex].timers[event.index]
         .copyWith(duration: event.duration);
     final newTimerSet = state.timerSets[event.setIndex].copyWith(

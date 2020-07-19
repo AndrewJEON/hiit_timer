@@ -86,10 +86,14 @@ class _TimerViewState extends State<TimerView> {
   Widget duration() {
     return BlocBuilder<TimerCreatingBloc, TimerCreatingState>(
       buildWhen: (previous, current) {
-        if (previous.timerSets[widget.setIndex].timers[widget.index].duration !=
-            current.timerSets[widget.setIndex].timers[widget.index].duration) {
-          return true;
-        } else {
+        try {
+          if (previous.timerSets[widget.setIndex].timers[widget.index].duration !=
+              current.timerSets[widget.setIndex].timers[widget.index].duration) {
+            return true;
+          } else {
+            return false;
+          }
+        } on RangeError {
           return false;
         }
       },
@@ -136,12 +140,36 @@ class _TimerViewState extends State<TimerView> {
       onSelected: (value) {
         switch (value) {
           case TimerOptions.copy:
+            context.bloc<TimerCreatingBloc>().add(
+                  TimerCopied(
+                    setIndex: widget.setIndex,
+                    index: widget.index,
+                  ),
+                );
             break;
           case TimerOptions.delete:
+            context.bloc<TimerCreatingBloc>().add(
+                  TimerDeleted(
+                    setIndex: widget.setIndex,
+                    index: widget.index,
+                  ),
+                );
             break;
           case TimerOptions.moveUp:
+            context.bloc<TimerCreatingBloc>().add(
+                  TimerMovedUp(
+                    setIndex: widget.setIndex,
+                    index: widget.index,
+                  ),
+                );
             break;
           case TimerOptions.moveDown:
+            context.bloc<TimerCreatingBloc>().add(
+                  TimerMovedDown(
+                    setIndex: widget.setIndex,
+                    index: widget.index,
+                  ),
+                );
             break;
           default:
             break;
