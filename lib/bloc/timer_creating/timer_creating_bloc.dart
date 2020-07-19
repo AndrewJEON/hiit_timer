@@ -6,7 +6,6 @@ import 'package:equatable/equatable.dart';
 import '../../data/models/model_timer_set.dart';
 
 part 'timer_creating_event.dart';
-
 part 'timer_creating_state.dart';
 
 class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerCreatingState> {
@@ -22,6 +21,10 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerCreatingState> {
       yield* _mapTimerSetCopiedToState(event);
     } else if (event is TimerSetDeleted) {
       yield* _mapTimerSetDeletedToState(event);
+    } else if (event is TimerSetMovedUp) {
+      yield* _mapTimerSetMovedUpToState(event);
+    } else if (event is TimerSetMovedDown) {
+      yield* _mapTimerSetMovedDownToState(event);
     } else if (event is TimerDescriptionChanged) {
       yield* _mapTimerDescriptionChangedToState(event);
     }
@@ -49,6 +52,28 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerCreatingState> {
   ) async* {
     yield TimerCreatingState(
       timerSets: List.of(state.timerSets)..removeAt(event.index),
+    );
+  }
+
+  Stream<TimerCreatingState> _mapTimerSetMovedUpToState(
+    TimerSetMovedUp event,
+  ) async* {
+    final target = state.timerSets[event.index];
+    yield TimerCreatingState(
+      timerSets: List.of(state.timerSets)
+        ..removeAt(event.index)
+        ..insert(event.index - 1, target),
+    );
+  }
+
+  Stream<TimerCreatingState> _mapTimerSetMovedDownToState(
+    TimerSetMovedDown event,
+  ) async* {
+    final target = state.timerSets[event.index];
+    yield TimerCreatingState(
+      timerSets: List.of(state.timerSets)
+        ..removeAt(event.index)
+        ..insert(event.index + 1, target),
     );
   }
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:interval_timer/bloc/timer_creating/timer_creating_bloc.dart';
 import 'package:meta/meta.dart';
 
+import '../../../bloc/timer_creating/timer_creating_bloc.dart';
 import '../../../data/models/model_timer.dart';
 
 class TimerView extends StatefulWidget {

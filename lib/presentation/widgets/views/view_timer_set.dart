@@ -88,8 +88,10 @@ class TimerSetView extends StatelessWidget {
             context.bloc<TimerCreatingBloc>().add(TimerSetDeleted(index));
             break;
           case TimerSetOptions.moveUp:
+            context.bloc<TimerCreatingBloc>().add(TimerSetMovedUp(index));
             break;
           case TimerSetOptions.moveDown:
+            context.bloc<TimerCreatingBloc>().add(TimerSetMovedDown(index));
             break;
           default:
             break;
