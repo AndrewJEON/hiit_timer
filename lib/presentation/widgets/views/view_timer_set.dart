@@ -33,7 +33,7 @@ class TimerSetView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              repeatCount(),
+              repeatCount(context),
               options(context),
             ],
           ),
@@ -58,20 +58,50 @@ class TimerSetView extends StatelessWidget {
     );
   }
 
-  Widget repeatCount() {
+  Widget repeatCount(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        IconButton(
-          icon: Icon(Icons.remove_circle),
-          iconSize: 16,
-          onPressed: () {},
+        Container(
+          width: 24,
+          height: 24,
+          child: IconButton(
+            onPressed: () {
+              context
+                  .bloc<TimerCreatingBloc>()
+                  .add(TimerSetRepeatCountDecreased(index));
+            },
+            icon: Icon(Icons.remove_circle),
+            iconSize: 16,
+            padding: const EdgeInsets.all(0),
+          ),
         ),
-        Text('${timerSet.repeatCount}'),
-        IconButton(
-          icon: Icon(Icons.remove_circle),
-          iconSize: 16,
-          onPressed: () {},
+        BlocBuilder<TimerCreatingBloc, TimerCreatingState>(
+          buildWhen: (previous, current) {
+            if (previous.timerSets[index].repeatCount !=
+                current.timerSets[index].repeatCount) {
+              return true;
+            } else {
+              return false;
+            }
+          },
+          builder: (context, state) {
+            return Text('${state.timerSets[index].repeatCount}x');
+          },
+        ),
+        Container(
+          width: 24,
+          height: 24,
+          child: IconButton(
+            onPressed: () {
+              context
+                  .bloc<TimerCreatingBloc>()
+                  .add(TimerSetRepeatCountIncreased(index));
+            },
+            icon: Icon(Icons.add_circle),
+            iconSize: 16,
+            padding: const EdgeInsets.all(0),
+          ),
         ),
       ],
     );

@@ -25,6 +25,10 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerCreatingState> {
       yield* _mapTimerSetMovedUpToState(event);
     } else if (event is TimerSetMovedDown) {
       yield* _mapTimerSetMovedDownToState(event);
+    } else if (event is TimerSetRepeatCountIncreased) {
+      yield* _mapTimerSetRepeatCountIncreasedToState(event);
+    } else if (event is TimerSetRepeatCountDecreased) {
+      yield* _mapTimerSetRepeatCountDecreasedToState(event);
     } else if (event is TimerDescriptionChanged) {
       yield* _mapTimerDescriptionChangedToState(event);
     }
@@ -75,6 +79,33 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerCreatingState> {
         ..removeAt(event.index)
         ..insert(event.index + 1, target),
     );
+  }
+
+  Stream<TimerCreatingState> _mapTimerSetRepeatCountIncreasedToState(
+    TimerSetRepeatCountIncreased event,
+  ) async* {
+    final newTimerSet = state.timerSets[event.index]
+        .copyWith(repeatCount: state.timerSets[event.index].repeatCount + 1);
+    yield TimerCreatingState(
+      timerSets: List.of(state.timerSets)
+        ..removeAt(event.index)
+        ..insert(event.index, newTimerSet),
+    );
+  }
+
+  Stream<TimerCreatingState> _mapTimerSetRepeatCountDecreasedToState(
+    TimerSetRepeatCountDecreased event,
+  ) async* {
+    final currentRepeatCount = state.timerSets[event.index].repeatCount;
+    if (currentRepeatCount > 1) {
+      final newTimerSet = state.timerSets[event.index]
+          .copyWith(repeatCount: currentRepeatCount - 1);
+      yield TimerCreatingState(
+        timerSets: List.of(state.timerSets)
+          ..removeAt(event.index)
+          ..insert(event.index, newTimerSet),
+      );
+    }
   }
 
   Stream<TimerCreatingState> _mapTimerDescriptionChangedToState(
