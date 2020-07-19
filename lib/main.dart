@@ -20,6 +20,9 @@ class MyApp extends StatelessWidget {
   ThemeData theme() {
     return ThemeData(
       primarySwatch: Colors.blue,
+      inputDecorationTheme: InputDecorationTheme(
+        border: InputBorder.none,
+      ),
       visualDensity: VisualDensity.adaptivePlatformDensity,
     );
   }

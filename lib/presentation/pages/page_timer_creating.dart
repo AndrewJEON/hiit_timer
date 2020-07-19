@@ -42,10 +42,13 @@ class TimerCreatingPage extends StatelessWidget {
                   return ListView(
                     children: <Widget>[
                       for (var i = 0; i < state.timerSets.length; i++)
-                        TimerSetView(
-                          key: UniqueKey(),
-                          timerSet: state.timerSets[i],
-                          index: i,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          child: TimerSetView(
+                            key: UniqueKey(),
+                            timerSet: state.timerSets[i],
+                            index: i,
+                          ),
                         ),
                     ],
                   );

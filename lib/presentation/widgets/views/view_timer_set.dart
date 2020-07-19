@@ -64,11 +64,15 @@ class TimerSetView extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   for (var i = 0; i < state.timerSets[index].timers.length; i++)
-                    TimerView(
-                      key: UniqueKey(),
-                      timer: state.timerSets[index].timers[i],
-                      setIndex: index,
-                      index: i,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 2),
+                      child: TimerView(
+                        key: UniqueKey(),
+                        timer: state.timerSets[index].timers[i],
+                        setIndex: index,
+                        index: i,
+                      ),
                     ),
                 ],
               );

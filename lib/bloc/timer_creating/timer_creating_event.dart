@@ -72,6 +72,21 @@ class TimerAdded extends TimerCreatingEvent {
   List<Object> get props => [index];
 }
 
+class TimerDurationChanged extends TimerCreatingEvent {
+  final Duration duration;
+  final int setIndex;
+  final int index;
+
+  TimerDurationChanged({
+    this.duration,
+    this.setIndex,
+    this.index,
+  });
+
+  @override
+  List<Object> get props => [duration, setIndex, index];
+}
+
 class TimerDescriptionChanged extends TimerCreatingEvent {
   final String description;
   final int setIndex;
