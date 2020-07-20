@@ -24,5 +24,5 @@ class TimerModel extends Equatable {
       };
 
   @override
-  List<Object> get props => [...timerSets];
+  List<Object> get props => [name, ...timerSets];
 }
