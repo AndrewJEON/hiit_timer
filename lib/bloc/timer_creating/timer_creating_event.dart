@@ -7,7 +7,14 @@ abstract class TimerCreatingEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class TimerSaved extends TimerCreatingEvent {}
+class TimerSaved extends TimerCreatingEvent {
+  final String name;
+
+  TimerSaved(this.name);
+
+  @override
+  List<Object> get props => [name];
+}
 
 class TimerSetAdded extends TimerCreatingEvent {}
 

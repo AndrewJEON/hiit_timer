@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'bloc/timer_creating/timer_creating_bloc.dart';
 import 'core/service_locator.dart';
-import 'data/models/model_timer.dart';
 import 'data/repositories/repository_timer.dart';
 import 'presentation/pages/page_timer_creating.dart';
 
@@ -33,18 +32,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: FutureBuilder<TimerModel>(
-          future: sl<TimerRepository>().load(),
-          builder: (context, snapshot) {
-            if(snapshot.hasData) {
-              return Text(snapshot.data.toString());
-            } else {
-              return CircularProgressIndicator();
-            }
-          },
-        ),
-      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Row(
         mainAxisSize: MainAxisSize.min,

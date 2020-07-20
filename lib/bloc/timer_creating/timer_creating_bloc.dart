@@ -20,7 +20,7 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
     TimerCreatingEvent event,
   ) async* {
     if (event is TimerSaved) {
-      await repository.save(state);
+      yield* _mapTimerSavedToState(event);
     } else if (event is TimerSetAdded) {
       yield* _mapTimerSetAddedToState(event);
     } else if (event is TimerSetCopied) {
@@ -50,6 +50,13 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
     } else if (event is TimerDescriptionChanged) {
       yield* _mapTimerDescriptionChangedToState(event);
     }
+  }
+
+  Stream<TimerModel> _mapTimerSavedToState(
+    TimerSaved event,
+  ) async* {
+    await repository
+        .save(TimerModel(name: event.name, timerSets: state.timerSets));
   }
 
   Stream<TimerModel> _mapTimerSetAddedToState(

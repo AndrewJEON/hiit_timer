@@ -7,16 +7,28 @@ import 'package:path_provider/path_provider.dart';
 import '../models/model_timer.dart';
 
 class TimerRepository {
-  Future<void> save(TimerModel state) async {
-    final root = (await getApplicationDocumentsDirectory()).path;
-    final timerPath = p.setExtension(p.join(root, 'test'), 'timer');
+  static const timerExtension = '.timer';
+
+  Future<void> save(TimerModel timer) async {
+    final rootPath = (await getApplicationDocumentsDirectory()).path;
+    final timerPath =
+        p.setExtension(p.join(rootPath, timer.name), timerExtension);
     final file = File(timerPath);
-    await file.writeAsString(jsonEncode(state));
+    await file.writeAsString(jsonEncode(timer));
   }
 
-  Future<TimerModel> load() async {
-    final root = (await getApplicationDocumentsDirectory()).path;
-    final file = File(p.setExtension(p.join(root, 'test'), 'timer'));
-    return TimerModel.fromJson(jsonDecode(await file.readAsString()));
+  Future<List<TimerModel>> load() async {
+    final rootDir = await getApplicationDocumentsDirectory();
+    final files = rootDir.list().where((entity) => entity is File).cast<File>();
+    final timers = <TimerModel>[];
+    await for (final file in files) {
+      if (p.extension(file.path) == timerExtension) {
+        final jsonString = await file.readAsString();
+        final name = p.basename(file.path);
+        final timer = TimerModel.fromJson(jsonDecode(jsonString), name);
+        timers.add(timer);
+      }
+    }
+    return timers;
   }
 }

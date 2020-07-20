@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/timer_creating/timer_creating_bloc.dart';
 import '../../data/models/model_timer.dart';
+import '../widgets/dialogs/dialog_timer_name.dart';
 import '../widgets/views/view_timer_set.dart';
 
 class TimerCreatingPage extends StatelessWidget {
@@ -14,9 +15,12 @@ class TimerCreatingPage extends StatelessWidget {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.check),
-            onPressed: () {
-              context.bloc<TimerCreatingBloc>().add(TimerSaved());
-              Navigator.pop(context);
+            onPressed: () async {
+              final name = await TimerNameDialog.show(context);
+              if (name != null) {
+                context.bloc<TimerCreatingBloc>().add(TimerSaved(name));
+                Navigator.pop(context);
+              }
             },
           ),
         ],
