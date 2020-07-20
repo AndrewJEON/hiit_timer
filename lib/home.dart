@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'bloc/timer/timer_bloc.dart';
 import 'bloc/timer_creating/timer_creating_bloc.dart';
 import 'core/service_locator.dart';
+import 'data/models/model_timer.dart';
 import 'data/repositories/repository_timer.dart';
 import 'presentation/pages/page_timer_creating.dart';
 
@@ -32,6 +34,24 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      body: BlocBuilder<TimerBloc, TimerState>(
+        builder: (context, state) {
+          if (state is TimerInitial) {
+            return Center(child: CircularProgressIndicator());
+          } else if (state is TimerIdle) {
+            return Center(
+              child: Text(state.timer.name),
+            );
+          } else if (state is TimerFailure) {
+            if (state == TimerFailure.noSavedTimer()) {
+              return Center(
+                child: Text(state.message),
+              );
+            }
+          }
+          return Container();
+        },
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Row(
         mainAxisSize: MainAxisSize.min,
@@ -70,7 +90,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           children: <Widget>[
             IconButton(
               icon: Icon(Icons.list),
-              onPressed: () {},
+              onPressed: () async {
+                final timer = await selectTimer();
+                if (timer != null) {
+                  context.bloc<TimerBloc>().add(TimerSelected(timer));
+                }
+              },
             ),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -100,6 +125,40 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           ],
         ),
       ),
+    );
+  }
+
+  Future<TimerModel> selectTimer() async {
+    return showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return FutureBuilder<List<TimerModel>>(
+          future: sl<TimerRepository>().load(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Oops! Something went wrong'));
+            }
+            final sortedTimers =
+                snapshot.data.sort((a, b) => a.name.compareTo(b.name));
+            return snapshot.data.isEmpty
+                ? Center(child: Text('No Saved Timer'))
+                : ListView.builder(
+                    itemCount: snapshot.data.length,
+                    itemBuilder: (context, i) {
+                      return ListTile(
+                        leading: Icon(Icons.timer),
+                        title: Text(snapshot.data[i].name),
+                        onTap: () {
+                          Navigator.pop(context, snapshot.data[i]);
+                        },
+                      );
+                    },
+                  );
+          },
+        );
+      },
     );
   }
 }

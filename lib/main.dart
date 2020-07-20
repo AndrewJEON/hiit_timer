@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'bloc/timer/timer_bloc.dart';
 import 'core/service_locator.dart';
+import 'data/repositories/repository_timer.dart';
 import 'home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initServiceLocator();
-  runApp(MyApp());
+  runApp(MultiBlocProvider(
+    providers: [
+      BlocProvider(create: (context) => TimerBloc(sl<TimerRepository>())),
+    ],
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -23,6 +31,11 @@ class MyApp extends StatelessWidget {
   ThemeData theme() {
     return ThemeData(
       primarySwatch: Colors.blue,
+      bottomSheetTheme: BottomSheetThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         border: InputBorder.none,
       ),

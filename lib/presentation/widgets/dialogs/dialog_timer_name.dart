@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
+
+import '../../../core/service_locator.dart';
 
 class TimerNameDialog extends StatefulWidget {
   static Future<String> show(BuildContext context) async {
@@ -75,10 +76,9 @@ class _TimerNameDialogState extends State<TimerNameDialog> {
   }
 
   Future<bool> isDuplicate(String name) async {
-    final rootDir = await getApplicationDocumentsDirectory();
-    final files = rootDir.list().where((entity) => entity is File).cast<File>();
+    final timerDir = sl<Directory>();
+    final files = timerDir.list().where((entity) => entity is File).cast<File>();
     await for (final file in files) {
-      print('File name: ${p.basenameWithoutExtension(file.path)}');
       if (p.basenameWithoutExtension(file.path) == name) {
         return true;
       }
