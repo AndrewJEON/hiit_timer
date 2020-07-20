@@ -1,37 +1,24 @@
 import 'package:equatable/equatable.dart';
 
+import 'model_timer_set.dart';
+
 class TimerModel extends Equatable {
-  final String description;
-  final Duration duration;
+  final List<TimerSetModel> timerSets;
 
-  TimerModel({
-    this.description,
-    this.duration,
-  });
+  TimerModel({this.timerSets});
 
-  TimerModel.initial()
-      : description = 'Work',
-        duration = const Duration(seconds: 30);
-
-  TimerModel copyWith({
-    String description,
-    Duration duration,
-  }) {
-    return TimerModel(
-      description: description ?? this.description,
-      duration: duration ?? this.duration,
-    );
-  }
+  TimerModel.initial() : timerSets = [TimerSetModel.initial()];
 
   TimerModel.fromJson(Map<String, dynamic> json)
-      : description = json['description'],
-        duration = Duration(seconds: json['duration']);
+      : timerSets = json['timerSets']
+            .map((timerSet) => TimerSetModel.fromJson(timerSet))
+            .toList()
+            .cast<TimerSetModel>();
 
   Map<String, dynamic> toJson() => {
-        'description': description,
-        'duration': duration.inSeconds,
+        'timerSets': timerSets.map((timerSet) => timerSet.toJson()).toList(),
       };
 
   @override
-  List<Object> get props => [description, duration];
+  List<Object> get props => [...timerSets];
 }

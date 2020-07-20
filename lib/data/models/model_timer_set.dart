@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 
-import 'model_timer.dart';
+import 'model_timer_piece.dart';
 
 class TimerSetModel extends Equatable {
-  final List<TimerModel> timers;
+  final List<TimerPieceModel> timers;
   final int repeatCount;
 
   TimerSetModel({
@@ -12,11 +12,11 @@ class TimerSetModel extends Equatable {
   });
 
   TimerSetModel.initial()
-      : timers = [TimerModel.initial()],
+      : timers = [TimerPieceModel.initial()],
         repeatCount = 1;
 
   TimerSetModel copyWith({
-    List<TimerModel> timers,
+    List<TimerPieceModel> timers,
     int repeatCount,
   }) {
     return TimerSetModel(
@@ -27,7 +27,7 @@ class TimerSetModel extends Equatable {
 
   TimerSetModel.fromJson(Map<String, dynamic> json)
       : timers =
-            json['timers'].map((timer) => TimerModel.fromJson(timer)).toList().cast<TimerModel>(),
+            json['timers'].map((timer) => TimerPieceModel.fromJson(timer)).toList().cast<TimerPieceModel>(),
         repeatCount = json['repeatCount'];
 
   Map<String, dynamic> toJson() => {

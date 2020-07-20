@@ -5,6 +5,7 @@ import 'package:meta/meta.dart';
 
 import '../../../bloc/timer_creating/timer_creating_bloc.dart';
 import '../../../data/models/model_timer.dart';
+import '../../../data/models/model_timer_piece.dart';
 
 class TimerOptions {
   static const copy = 'Copy';
@@ -15,7 +16,7 @@ class TimerOptions {
 }
 
 class TimerView extends StatefulWidget {
-  final TimerModel timer;
+  final TimerPieceModel timer;
   final int setIndex;
   final int index;
 
@@ -84,7 +85,7 @@ class _TimerViewState extends State<TimerView> {
   }
 
   Widget duration() {
-    return BlocBuilder<TimerCreatingBloc, TimerCreatingState>(
+    return BlocBuilder<TimerCreatingBloc, TimerModel>(
       buildWhen: (previous, current) {
         try {
           if (previous.timerSets[widget.setIndex].timers[widget.index].duration !=

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
 import '../../../bloc/timer_creating/timer_creating_bloc.dart';
+import '../../../data/models/model_timer.dart';
 import '../../../data/models/model_timer_set.dart';
 import 'view_timer.dart';
 
@@ -38,7 +39,7 @@ class TimerSetView extends StatelessWidget {
             ],
           ),
           Divider(),
-          BlocBuilder<TimerCreatingBloc, TimerCreatingState>(
+          BlocBuilder<TimerCreatingBloc, TimerModel>(
             buildWhen: (previous, current) {
               if (previous.timerSets[index].timers.length !=
                   current.timerSets[index].timers.length) {
@@ -111,7 +112,7 @@ class TimerSetView extends StatelessWidget {
             padding: const EdgeInsets.all(0),
           ),
         ),
-        BlocBuilder<TimerCreatingBloc, TimerCreatingState>(
+        BlocBuilder<TimerCreatingBloc, TimerModel>(
           buildWhen: (previous, current) {
             if (previous.timerSets[index].repeatCount !=
                 current.timerSets[index].repeatCount) {

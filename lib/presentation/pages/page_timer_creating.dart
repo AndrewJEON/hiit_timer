@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/timer_creating/timer_creating_bloc.dart';
+import '../../data/models/model_timer.dart';
 import '../widgets/views/view_timer_set.dart';
 
 class TimerCreatingPage extends StatelessWidget {
@@ -24,7 +25,7 @@ class TimerCreatingPage extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Expanded(
-              child: BlocBuilder<TimerCreatingBloc, TimerCreatingState>(
+              child: BlocBuilder<TimerCreatingBloc, TimerModel>(
                 buildWhen: (previous, current) {
                   if (previous.timerSets.length != current.timerSets.length) {
                     return true;
