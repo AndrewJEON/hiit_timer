@@ -10,6 +10,7 @@ import '../../data/models/model_timer_piece.dart';
 import '../../data/repositories/repository_timer.dart';
 
 part 'timer_event.dart';
+
 part 'timer_state.dart';
 
 class TimerBloc extends Bloc<TimerEvent, TimerState> {
@@ -168,6 +169,18 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
       } else {
         if (_repeatCount > 1) {
           _repeatCount--;
+          final remainingTime = _currentTimer[_index = 0].duration;
+          yield TimerRunning(
+            remainingTime: remainingTime,
+            repeatCount: state.repeatCount,
+          );
+          _tickerSubscription?.cancel();
+          _tickerSubscription = _tick(ticks: remainingTime.inSeconds).listen(
+            (remainingTime) {
+              add(TimerTicked(remainingTime: Duration(seconds: remainingTime)));
+            },
+          );
+        } else if (_repeatCount == -1) {
           final remainingTime = _currentTimer[_index = 0].duration;
           yield TimerRunning(
             remainingTime: remainingTime,
