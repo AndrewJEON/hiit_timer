@@ -39,12 +39,11 @@ class _RepeatCountBottomSheetState extends State<RepeatCountBottomSheet> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Set repeat count',
-                style: Theme.of(context).textTheme.bodyText1,
-              ),
+            FlatButton(
+              onPressed: () {
+                Navigator.pop(context, null);
+              },
+              child: Text('Cancel'),
             ),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -60,6 +59,7 @@ class _RepeatCountBottomSheetState extends State<RepeatCountBottomSheet> {
                     Navigator.pop(context, _repeatCount);
                   },
                   child: Text('Done'),
+                  textColor: Theme.of(context).primaryColor,
                 ),
               ],
             ),
@@ -72,7 +72,7 @@ class _RepeatCountBottomSheetState extends State<RepeatCountBottomSheet> {
             children: <Widget>[
               IconButton(
                 onPressed: () {
-                  if(_repeatCount > 1) {
+                  if (_repeatCount > 1) {
                     setState(() {
                       _repeatCount--;
                     });
