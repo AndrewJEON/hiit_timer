@@ -8,20 +8,24 @@ import 'package:meta/meta.dart';
 import '../../data/models/model_timer.dart';
 import '../../data/models/model_timer_piece.dart';
 import '../../data/repositories/repository_timer.dart';
+import '../repeat_count/repeat_count_bloc.dart';
 
 part 'timer_event.dart';
-
 part 'timer_state.dart';
 
 class TimerBloc extends Bloc<TimerEvent, TimerState> {
   final TimerRepository repository;
+  final RepeatCountBloc repeatCountBloc;
 
   StreamSubscription<int> _tickerSubscription;
   List<TimerPieceModel> _currentTimer;
   int _index = 0;
   int _repeatCount;
 
-  TimerBloc(this.repository) : super(TimerInitial()) {
+  TimerBloc({
+    this.repository,
+    this.repeatCountBloc,
+  }) : super(TimerInitial()) {
     add(TimerInitialized());
   }
 
@@ -61,8 +65,6 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
         yield* _mapTimerTickedToState(event);
       } else if (event is TimerSelected) {
         yield* _mapTimerSelectedToState(event);
-      } else if (event is TimerRepeatCountChanged) {
-        yield* _mapTimerRepeatCountChangedToState(event);
       }
     } catch (e) {
       debugPrint('TimerBloc error: $e');
@@ -80,13 +82,10 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     TimerInitialized event,
   ) async* {
     final latestTimer = await repository.loadLatestTimer();
-    _repeatCount = await repository.loadRepeatCount();
+    _repeatCount = repeatCountBloc.state;
     if (latestTimer != null) {
       _currentTimer = _flattenTimer(latestTimer);
-      yield TimerReady(
-        remainingTime: _currentTimer[_index = 0].duration,
-        repeatCount: _repeatCount,
-      );
+      yield TimerReady(remainingTime: _currentTimer[_index = 0].duration);
     } else {
       yield TimerFailure.noSavedTimer();
     }
@@ -95,12 +94,9 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   Stream<TimerState> _mapTimerStartedToState(
     TimerStarted event,
   ) async* {
-    _repeatCount = state.repeatCount;
+    _repeatCount = repeatCountBloc.state;
     final remainingTime = _currentTimer[_index = 0].duration;
-    yield TimerRunning(
-      remainingTime: remainingTime,
-      repeatCount: state.repeatCount,
-    );
+    yield TimerRunning(remainingTime: remainingTime);
     _tickerSubscription?.cancel();
     _tickerSubscription = _tick(ticks: remainingTime.inSeconds).listen(
       (remainingTime) {
@@ -115,10 +111,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     final currentState = state;
     if (currentState is TimerRunning) {
       _tickerSubscription?.pause();
-      yield TimerPause(
-        remainingTime: currentState.remainingTime,
-        repeatCount: state.repeatCount,
-      );
+      yield TimerPause(remainingTime: currentState.remainingTime);
     }
   }
 
@@ -128,10 +121,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     final currentState = state;
     if (currentState is TimerPause) {
       _tickerSubscription?.resume();
-      yield TimerRunning(
-        remainingTime: currentState.remainingTime,
-        repeatCount: state.repeatCount,
-      );
+      yield TimerRunning(remainingTime: currentState.remainingTime);
     }
   }
 
@@ -139,27 +129,18 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     TimerReset event,
   ) async* {
     _tickerSubscription?.cancel();
-    yield TimerReady(
-      remainingTime: _currentTimer[_index = 0].duration,
-      repeatCount: state.repeatCount,
-    );
+    yield TimerReady(remainingTime: _currentTimer[_index = 0].duration);
   }
 
   Stream<TimerState> _mapTimerTickedToState(
     TimerTicked event,
   ) async* {
     if (event.remainingTime.inSeconds > 0) {
-      yield TimerRunning(
-        remainingTime: event.remainingTime,
-        repeatCount: state.repeatCount,
-      );
+      yield TimerRunning(remainingTime: event.remainingTime);
     } else {
       if (_index < _currentTimer.length - 1) {
         final remainingTime = _currentTimer[++_index].duration;
-        yield TimerRunning(
-          remainingTime: remainingTime,
-          repeatCount: state.repeatCount,
-        );
+        yield TimerRunning(remainingTime: remainingTime);
         _tickerSubscription?.cancel();
         _tickerSubscription = _tick(ticks: remainingTime.inSeconds).listen(
           (remainingTime) {
@@ -170,10 +151,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
         if (_repeatCount > 1) {
           _repeatCount--;
           final remainingTime = _currentTimer[_index = 0].duration;
-          yield TimerRunning(
-            remainingTime: remainingTime,
-            repeatCount: state.repeatCount,
-          );
+          yield TimerRunning(remainingTime: remainingTime);
           _tickerSubscription?.cancel();
           _tickerSubscription = _tick(ticks: remainingTime.inSeconds).listen(
             (remainingTime) {
@@ -182,10 +160,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
           );
         } else if (_repeatCount == -1) {
           final remainingTime = _currentTimer[_index = 0].duration;
-          yield TimerRunning(
-            remainingTime: remainingTime,
-            repeatCount: state.repeatCount,
-          );
+          yield TimerRunning(remainingTime: remainingTime);
           _tickerSubscription?.cancel();
           _tickerSubscription = _tick(ticks: remainingTime.inSeconds).listen(
             (remainingTime) {
@@ -193,7 +168,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
             },
           );
         } else {
-          yield TimerFinish(repeatCount: state.repeatCount);
+          yield TimerFinish();
         }
       }
     }
@@ -205,22 +180,6 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     _tickerSubscription?.cancel();
     await repository.saveCurrentTimer(event.timer);
     _currentTimer = _flattenTimer(event.timer);
-    yield TimerReady(
-      remainingTime: _currentTimer[_index = 0].duration,
-      repeatCount: state.repeatCount,
-    );
-  }
-
-  Stream<TimerState> _mapTimerRepeatCountChangedToState(
-    TimerRepeatCountChanged event,
-  ) async* {
-    if (event.repeatCount >= -1) {
-      await repository
-          .saveRepeatCount(event.repeatCount == 0 ? 1 : event.repeatCount);
-      yield TimerReady(
-        remainingTime: _currentTimer[_index = 0].duration,
-        repeatCount: event.repeatCount == 0 ? 1 : event.repeatCount,
-      );
-    }
+    yield TimerReady(remainingTime: _currentTimer[_index = 0].duration);
   }
 }

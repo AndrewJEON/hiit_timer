@@ -34,12 +34,3 @@ class TimerSelected extends TimerEvent {
   @override
   List<Object> get props => [timer];
 }
-
-class TimerRepeatCountChanged extends TimerEvent {
-  final int repeatCount;
-
-  TimerRepeatCountChanged(this.repeatCount);
-
-  @override
-  List<Object> get props => [repeatCount];
-}

@@ -2,15 +2,11 @@ part of 'timer_bloc.dart';
 
 abstract class TimerState extends Equatable {
   final Duration remainingTime;
-  final int repeatCount;
 
-  TimerState({
-    this.remainingTime,
-    this.repeatCount,
-  });
+  TimerState({this.remainingTime});
 
   @override
-  List<Object> get props => [remainingTime, repeatCount];
+  List<Object> get props => [remainingTime];
 }
 
 class TimerInitial extends TimerState {
@@ -18,43 +14,19 @@ class TimerInitial extends TimerState {
 }
 
 class TimerReady extends TimerState {
-  TimerReady({
-    Duration remainingTime,
-    int repeatCount,
-  }) : super(
-          remainingTime: remainingTime,
-          repeatCount: repeatCount,
-        );
+  TimerReady({Duration remainingTime}) : super(remainingTime: remainingTime);
 }
 
 class TimerRunning extends TimerState {
-  TimerRunning({
-    Duration remainingTime,
-    int repeatCount,
-  }) : super(
-          remainingTime: remainingTime,
-          repeatCount: repeatCount,
-        );
+  TimerRunning({Duration remainingTime}) : super(remainingTime: remainingTime);
 }
 
 class TimerPause extends TimerState {
-  TimerPause({
-    Duration remainingTime,
-    int repeatCount,
-  }) : super(
-          remainingTime: remainingTime,
-          repeatCount: repeatCount,
-        );
+  TimerPause({Duration remainingTime}) : super(remainingTime: remainingTime);
 }
 
 class TimerFinish extends TimerState {
-  TimerFinish({
-    Duration remainingTime,
-    int repeatCount,
-  }) : super(
-          remainingTime: Duration.zero,
-          repeatCount: repeatCount,
-        );
+  TimerFinish({Duration remainingTime}) : super(remainingTime: Duration.zero);
 }
 
 class TimerFailure extends TimerState {

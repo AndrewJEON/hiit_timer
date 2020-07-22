@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
+import 'bloc/repeat_count/repeat_count_bloc.dart';
 import 'bloc/timer/timer_bloc.dart';
 import 'core/utils.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_presets.dart';
@@ -142,58 +143,53 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     return BlocBuilder<TimerBloc, TimerState>(
       builder: (context, state) {
         if (state is TimerReady) {
-          return FlatButton.icon(
-            onPressed: () async {
-              final repeatCount = await RepeatCountBottomSheet.show(
-                context,
-                currentRepeatCount:
-                    state.repeatCount == -1 ? 1 : state.repeatCount,
-              );
-              if (repeatCount != null) {
-                context
-                    .bloc<TimerBloc>()
-                    .add(TimerRepeatCountChanged(repeatCount));
-              }
-            },
-            icon: Icon(Icons.repeat),
-            label: BlocBuilder<TimerBloc, TimerState>(
-              builder: (context, state) {
-                if (state.repeatCount == -1) {
-                  return Icon(Ionicons.ios_infinite);
-                } else {
-                  return Text(
-                    '${state.repeatCount}x',
-                    style: Theme.of(context).textTheme.bodyText1,
+          return BlocBuilder<RepeatCountBloc, int>(
+            builder: (context, state) {
+              return FlatButton.icon(
+                onPressed: () async {
+                  final repeatCount = await RepeatCountBottomSheet.show(
+                    context,
+                    currentRepeatCount: state == -1 ? 1 : state,
                   );
-                }
-              },
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
+                  if (repeatCount != null) {
+                    context
+                        .bloc<RepeatCountBloc>()
+                        .add(RepeatCountChanged(repeatCount));
+                  }
+                },
+                icon: Icon(Icons.repeat),
+                label: state == -1
+                    ? Icon(Ionicons.ios_infinite)
+                    : Text(
+                        '${state}x',
+                        style: Theme.of(context).textTheme.bodyText1,
+                      ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              );
+            },
           );
         } else {
-          return FlatButton.icon(
-            onPressed: null,
-            icon: Icon(Icons.repeat),
-            label: BlocBuilder<TimerBloc, TimerState>(
-              builder: (context, state) {
-                if (state.repeatCount == -1) {
-                  return Icon(Ionicons.ios_infinite);
-                } else {
-                  return Text(
-                    '${state.repeatCount}x',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1
-                        .copyWith(color: Colors.grey),
-                  );
-                }
-              },
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
+          return BlocBuilder<RepeatCountBloc, int>(
+            builder: (context, state) {
+              return FlatButton.icon(
+                onPressed: null,
+                icon: Icon(Icons.repeat),
+                label: state == -1
+                    ? Icon(Ionicons.ios_infinite)
+                    : Text(
+                        '${state}x',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.grey),
+                      ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              );
+            },
           );
         }
       },
