@@ -9,6 +9,8 @@ import '../models/model_timer.dart';
 
 class TimerRepository {
   static const timerExtension = '.timer';
+  static const latestTimerKey = 'latest_timer';
+  static const repeatCountKey = 'repeat_count';
 
   final prefs = sl<SharedPreferences>();
   final timerDir = sl<Directory>();
@@ -21,7 +23,8 @@ class TimerRepository {
   }
 
   Future<List<TimerModel>> load() async {
-    final files = timerDir.list().where((entity) => entity is File).cast<File>();
+    final files =
+        timerDir.list().where((entity) => entity is File).cast<File>();
     final timers = <TimerModel>[];
     await for (final file in files) {
       if (p.extension(file.path) == timerExtension) {
@@ -35,10 +38,11 @@ class TimerRepository {
   }
 
   Future<TimerModel> loadLatestTimer() async {
-    final name = prefs.getString('latest_timer');
-    final files = timerDir.list().where((entity) => entity is File).cast<File>();
-    await for(final file in files) {
-      if(p.basenameWithoutExtension(file.path) == name) {
+    final name = prefs.getString(latestTimerKey);
+    final files =
+        timerDir.list().where((entity) => entity is File).cast<File>();
+    await for (final file in files) {
+      if (p.basenameWithoutExtension(file.path) == name) {
         final jsonString = await file.readAsString();
         final name = p.basenameWithoutExtension(file.path);
         return TimerModel.fromJson(jsonDecode(jsonString), name);
@@ -48,6 +52,14 @@ class TimerRepository {
   }
 
   Future<void> saveCurrentTimer(TimerModel timer) async {
-    prefs.setString('latest_timer', timer.name);
+    prefs.setString(latestTimerKey, timer.name);
+  }
+
+  Future<int> loadRepeatCount() async {
+    return prefs.getInt(repeatCountKey) ?? 1;
+  }
+
+  Future<void> saveRepeatCount(int repeatCount) async {
+    prefs.setInt(repeatCountKey, repeatCount);
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:meta/meta.dart';
 
 import '../../../bloc/timer_creating/timer_creating_bloc.dart';
+import '../../../core/utils.dart';
 import '../../../data/models/model_timer.dart';
 import '../../../data/models/model_timer_piece.dart';
 
@@ -88,8 +89,10 @@ class _TimerViewState extends State<TimerView> {
     return BlocBuilder<TimerCreatingBloc, TimerModel>(
       buildWhen: (previous, current) {
         try {
-          if (previous.timerSets[widget.setIndex].timers[widget.index].duration !=
-              current.timerSets[widget.setIndex].timers[widget.index].duration) {
+          if (previous
+                  .timerSets[widget.setIndex].timers[widget.index].duration !=
+              current
+                  .timerSets[widget.setIndex].timers[widget.index].duration) {
             return true;
           } else {
             return false;
@@ -128,9 +131,7 @@ class _TimerViewState extends State<TimerView> {
                   );
             }
           },
-          child: Text(
-            '${duration.inHours.toString().padLeft(2, '0')}:${duration.inMinutes.remainder(60).toString().padLeft(2, '0')}:${duration.inSeconds.remainder(60).toString().padLeft(2, '0')}',
-          ),
+          child: Text(formatDuration(duration, showHour: true)),
         );
       },
     );
