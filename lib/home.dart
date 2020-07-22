@@ -4,12 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
 import 'bloc/timer/timer_bloc.dart';
-import 'bloc/timer_creating/timer_creating_bloc.dart';
-import 'core/service_locator.dart';
 import 'core/utils.dart';
-import 'data/models/model_timer.dart';
-import 'data/repositories/repository_timer.dart';
-import 'presentation/pages/page_timer_creating.dart';
+import 'presentation/widgets/bottom_sheet/bottom_sheet_presets.dart';
+import 'presentation/widgets/bottom_sheet/bottom_sheet_repeat_count.dart';
 
 class RepeatCountOptions {
   static const x2 = '2x';
@@ -55,98 +52,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  BlocBuilder<TimerBloc, TimerState>(
-                    builder: (context, state) {
-                      if(state is TimerReady) {
-                        return FlatButton.icon(
-                          onPressed: () {
-                            _getRepeatCount();
-                          },
-                          icon: Icon(Icons.repeat),
-                          label: BlocBuilder<TimerBloc, TimerState>(
-                            builder: (context, state) {
-                              if (state.repeatCount == -1) {
-                                return Icon(Ionicons.ios_infinite);
-                              } else {
-                                return Text(
-                                  '${state.repeatCount}x',
-                                  style: Theme.of(context).textTheme.bodyText1,
-                                );
-                              }
-                            },
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        );
-                      } else {
-                        return FlatButton.icon(
-                          onPressed: null,
-                          icon: Icon(Icons.repeat),
-                          label: BlocBuilder<TimerBloc, TimerState>(
-                            builder: (context, state) {
-                              if (state.repeatCount == -1) {
-                                return Icon(Ionicons.ios_infinite);
-                              } else {
-                                return Text(
-                                  '${state.repeatCount}x',
-                                  style: Theme.of(context).textTheme.bodyText1.copyWith(
-                                    color: Colors.grey
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                  FlatButton.icon(
-                    onPressed: () {
-                      context.bloc<TimerBloc>().add(TimerReset());
-                    },
-                    icon: Icon(Icons.refresh),
-                    label: Text('Reset'),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
+                  repeatCount(),
+                  resetButton(),
                 ],
               ),
             ),
-            Expanded(
-              child: BlocBuilder<TimerBloc, TimerState>(
-                builder: (context, state) {
-                  if (state is TimerInitial) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (state is TimerReady) {
-                    return Center(
-                      child: Text(formatDuration(state.remainingTime)),
-                    );
-                  } else if (state is TimerRunning) {
-                    return Center(
-                      child: Text(formatDuration(state.remainingTime)),
-                    );
-                  } else if (state is TimerPause) {
-                    return Center(
-                      child: Text(formatDuration(state.remainingTime)),
-                    );
-                  } else if (state is TimerFinish) {
-                    return Center(
-                      child: Text('Done!'),
-                    );
-                  } else if (state is TimerFailure) {
-                    return Center(
-                      child: Text(state.message),
-                    );
-                  }
-                  return Container();
-                },
-              ),
-            ),
+            Expanded(child: remainingTime()),
           ],
         ),
       ),
@@ -211,7 +122,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             IconButton(
               icon: Icon(Icons.list),
               onPressed: () async {
-                final timer = await _selectTimer();
+                final timer = await PresetsBottomSheet.show(context);
                 if (timer != null) {
                   context.bloc<TimerBloc>().add(TimerSelected(timer));
                 }
@@ -227,154 +138,108 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
-  Future<int> _getRepeatCount() async {
-    return showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  IconButton(
-                    onPressed: () {
-                      final currentRepeatCount =
-                          context.bloc<TimerBloc>().state.repeatCount;
-                      context
-                          .bloc<TimerBloc>()
-                          .add(TimerRepeatCountChanged(currentRepeatCount - 1));
-                    },
-                    icon: Icon(Icons.remove_circle),
-                    iconSize: 32,
-                  ),
-                  SizedBox(width: 16),
-                  BlocBuilder<TimerBloc, TimerState>(
-                    builder: (context, state) {
-                      if (state.repeatCount == -1) {
-                        return Icon(Ionicons.ios_infinite);
-                      } else {
-                        return Text(
-                          '${state.repeatCount}x',
-                          style: Theme.of(context).textTheme.bodyText1.copyWith(
-                                fontSize: 32,
-                              ),
-                        );
-                      }
-                    },
-                  ),
-                  SizedBox(width: 16),
-                  IconButton(
-                    onPressed: () {
-                      final currentRepeatCount =
-                          context.bloc<TimerBloc>().state.repeatCount;
-                      context
-                          .bloc<TimerBloc>()
-                          .add(TimerRepeatCountChanged(currentRepeatCount + 1));
-                    },
-                    icon: Icon(Icons.add_circle),
-                    iconSize: 32,
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              Text(
-                'Or',
-                style: Theme.of(context).textTheme.caption,
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: FlatButton.icon(
-                  onPressed: () {
-                    context.bloc<TimerBloc>().add(TimerRepeatCountChanged(-1));
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    Ionicons.ios_infinite,
-                    //size: 20,
-                  ),
-                  label: Text(
-                    'Infinite Loop',
-                    style: Theme.of(context).textTheme.bodyText1.copyWith(
-                          fontSize: 20,
-                        ),
-                  ),
-                ),
-              )
-            ],
-          ),
-        );
+  Widget repeatCount() {
+    return BlocBuilder<TimerBloc, TimerState>(
+      builder: (context, state) {
+        if (state is TimerReady) {
+          return FlatButton.icon(
+            onPressed: () async {
+              final repeatCount = await RepeatCountBottomSheet.show(
+                context,
+                currentRepeatCount:
+                    state.repeatCount == -1 ? 1 : state.repeatCount,
+              );
+              if (repeatCount != null) {
+                context
+                    .bloc<TimerBloc>()
+                    .add(TimerRepeatCountChanged(repeatCount));
+              }
+            },
+            icon: Icon(Icons.repeat),
+            label: BlocBuilder<TimerBloc, TimerState>(
+              builder: (context, state) {
+                if (state.repeatCount == -1) {
+                  return Icon(Ionicons.ios_infinite);
+                } else {
+                  return Text(
+                    '${state.repeatCount}x',
+                    style: Theme.of(context).textTheme.bodyText1,
+                  );
+                }
+              },
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          );
+        } else {
+          return FlatButton.icon(
+            onPressed: null,
+            icon: Icon(Icons.repeat),
+            label: BlocBuilder<TimerBloc, TimerState>(
+              builder: (context, state) {
+                if (state.repeatCount == -1) {
+                  return Icon(Ionicons.ios_infinite);
+                } else {
+                  return Text(
+                    '${state.repeatCount}x',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText1
+                        .copyWith(color: Colors.grey),
+                  );
+                }
+              },
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          );
+        }
       },
     );
   }
 
-  Future<TimerModel> _selectTimer() async {
-    return showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return FutureBuilder<List<TimerModel>>(
-          future: sl<TimerRepository>().load(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Oops! Something went wrong'));
-            }
-            final sortedTimers = snapshot.data
-              ..sort((a, b) => a.name.compareTo(b.name));
-            if (sortedTimers.isEmpty) {
-              return Center(child: Text('No Saved Timer'));
-            } else {
-              return Column(
-                children: <Widget>[
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: sortedTimers.length,
-                      itemBuilder: (context, i) {
-                        return ListTile(
-                          leading: Icon(Icons.timer),
-                          title: Text(snapshot.data[i].name),
-                          onTap: () {
-                            Navigator.pop(context, snapshot.data[i]);
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FlatButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BlocProvider(
-                              create: (context) => TimerCreatingBloc(
-                                sl<TimerRepository>(),
-                              ),
-                              child: TimerCreatingPage(),
-                            ),
-                          ),
-                        );
-                      },
-                      icon: Icon(Icons.add),
-                      label: Text('Add New Timer'),
-                    ),
-                  ),
-                ],
-              );
-            }
-          },
-        );
+  Widget resetButton() {
+    return FlatButton.icon(
+      onPressed: () {
+        context.bloc<TimerBloc>().add(TimerReset());
+      },
+      icon: Icon(Icons.refresh),
+      label: Text('Reset'),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    );
+  }
+
+  Widget remainingTime() {
+    return BlocBuilder<TimerBloc, TimerState>(
+      builder: (context, state) {
+        if (state is TimerInitial) {
+          return Center(child: CircularProgressIndicator());
+        } else if (state is TimerReady) {
+          return Center(
+            child: Text(formatDuration(state.remainingTime)),
+          );
+        } else if (state is TimerRunning) {
+          return Center(
+            child: Text(formatDuration(state.remainingTime)),
+          );
+        } else if (state is TimerPause) {
+          return Center(
+            child: Text(formatDuration(state.remainingTime)),
+          );
+        } else if (state is TimerFinish) {
+          return Center(
+            child: Text('Done!'),
+          );
+        } else if (state is TimerFailure) {
+          return Center(
+            child: Text(state.message),
+          );
+        }
+        return Container();
       },
     );
   }
