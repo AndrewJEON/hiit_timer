@@ -25,6 +25,35 @@ class PresetsBottomSheet extends StatelessWidget {
         } else {
           return Column(
             children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  FlatButton(
+                    onPressed: () {
+                      Navigator.pop(context, null);
+                    },
+                    child: Text('Cancel'),
+                  ),
+                  FlatButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BlocProvider(
+                            create: (context) => TimerCreatingBloc(
+                              sl<TimerRepository>(),
+                            ),
+                            child: TimerCreatingPage(),
+                          ),
+                        ),
+                      );
+                    },
+                    icon: Icon(Icons.add),
+                    label: Text('New Timer'),
+                    textColor: Theme.of(context).primaryColor,
+                  ),
+                ],
+              ),
               Expanded(
                 child: ListView.builder(
                   itemCount: sortedTimers.length,
@@ -37,26 +66,6 @@ class PresetsBottomSheet extends StatelessWidget {
                       },
                     );
                   },
-                ),
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: FlatButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BlocProvider(
-                          create: (context) => TimerCreatingBloc(
-                            sl<TimerRepository>(),
-                          ),
-                          child: TimerCreatingPage(),
-                        ),
-                      ),
-                    );
-                  },
-                  icon: Icon(Icons.add),
-                  label: Text('Add New Timer'),
                 ),
               ),
             ],
