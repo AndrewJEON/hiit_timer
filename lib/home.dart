@@ -5,7 +5,9 @@ import 'package:flutter_icons/flutter_icons.dart';
 
 import 'bloc/repeat_count/repeat_count_bloc.dart';
 import 'bloc/timer/timer_bloc.dart';
+import 'bloc/timer_select/timer_select_bloc.dart';
 import 'core/utils.dart';
+import 'data/models/model_timer.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_presets.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_repeat_count.dart';
 
@@ -54,6 +56,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   repeatCount(),
+                  timerName(),
                   resetButton(),
                 ],
               ),
@@ -125,7 +128,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               onPressed: () async {
                 final timer = await PresetsBottomSheet.show(context);
                 if (timer != null) {
-                  context.bloc<TimerBloc>().add(TimerSelected(timer));
+                  context.bloc<TimerSelectBloc>().add(TimerSelected(timer));
                 }
               },
             ),
@@ -196,6 +199,21 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
+  Widget timerName() {
+    return BlocBuilder<TimerSelectBloc, TimerModel>(
+      builder: (context, state) {
+        if (state == null) {
+          return Container();
+        } else {
+          return Text(
+            state.name,
+            style: Theme.of(context).textTheme.headline6,
+          );
+        }
+      },
+    );
+  }
+
   Widget resetButton() {
     return FlatButton.icon(
       onPressed: () {
@@ -214,18 +232,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       builder: (context, state) {
         if (state is TimerInitial) {
           return Center(child: CircularProgressIndicator());
-        } else if (state is TimerReady) {
-          return Center(
-            child: Text(formatDuration(state.remainingTime)),
-          );
-        } else if (state is TimerRunning) {
-          return Center(
-            child: Text(formatDuration(state.remainingTime)),
-          );
-        } else if (state is TimerPause) {
-          return Center(
-            child: Text(formatDuration(state.remainingTime)),
-          );
         } else if (state is TimerFinish) {
           return Center(
             child: Text('Done!'),
@@ -234,8 +240,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           return Center(
             child: Text(state.message),
           );
+        } else {
+          return Center(
+            child: Text(
+              formatDuration(state.remainingTime),
+              style: Theme.of(context).textTheme.headline1,
+            ),
+          );
         }
-        return Container();
       },
     );
   }

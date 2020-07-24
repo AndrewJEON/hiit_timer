@@ -63,8 +63,6 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
         yield* _mapTimerResetToState(event);
       } else if (event is TimerTicked) {
         yield* _mapTimerTickedToState(event);
-      } else if (event is TimerSelected) {
-        yield* _mapTimerSelectedToState(event);
       }
     } catch (e) {
       debugPrint('TimerBloc error: $e');
@@ -129,6 +127,9 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     TimerReset event,
   ) async* {
     _tickerSubscription?.cancel();
+    if (event.timer != null) {
+      _currentTimer = _flattenTimer(event.timer);
+    }
     yield TimerReady(remainingTime: _currentTimer[_index = 0].duration);
   }
 
@@ -172,14 +173,5 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
         }
       }
     }
-  }
-
-  Stream<TimerState> _mapTimerSelectedToState(
-    TimerSelected event,
-  ) async* {
-    _tickerSubscription?.cancel();
-    await repository.saveCurrentTimer(event.timer);
-    _currentTimer = _flattenTimer(event.timer);
-    yield TimerReady(remainingTime: _currentTimer[_index = 0].duration);
   }
 }

@@ -6,20 +6,46 @@ import '../../data/models/model_timer.dart';
 import '../widgets/dialogs/dialog_timer_name.dart';
 import '../widgets/views/view_timer_set.dart';
 
-class TimerCreatingPage extends StatelessWidget {
+class TimerCreatingPage extends StatefulWidget {
+  final TimerModel timer;
+
+  TimerCreatingPage({this.timer});
+
+  @override
+  _TimerCreatingPageState createState() => _TimerCreatingPageState();
+}
+
+class _TimerCreatingPageState extends State<TimerCreatingPage> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.timer != null) {
+      context
+          .bloc<TimerCreatingBloc>()
+          .add(TimerCreatingInitialized(widget.timer));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Creating'),
+        title: Text(widget.timer == null ? 'Creating' : 'Editing'),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.check),
             onPressed: () async {
-              final name = await TimerNameDialog.show(context);
-              if (name != null) {
-                context.bloc<TimerCreatingBloc>().add(TimerSaved(name));
-                Navigator.pop(context);
+              if (widget.timer == null) {
+                final name = await TimerNameDialog.show(context);
+                if (name != null) {
+                  final timerSets =
+                      context.bloc<TimerCreatingBloc>().state.timerSets;
+                  final timer = TimerModel(name: name, timerSets: timerSets);
+                  Navigator.pop(context, timer);
+                }
+              } else {
+                final timer = context.bloc<TimerCreatingBloc>().state;
+                Navigator.pop(context, timer);
               }
             },
           ),

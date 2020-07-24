@@ -23,6 +23,16 @@ class TimerModel extends Equatable {
         'timerSets': timerSets.map((timerSet) => timerSet.toJson()).toList(),
       };
 
+  TimerModel copyWith({
+    String name,
+    List<TimerSetModel> timerSets,
+  }) {
+    return TimerModel(
+      name: name ?? this.name,
+      timerSets: timerSets ?? this.timerSets,
+    );
+  }
+
   @override
   List<Object> get props => [name, ...timerSets];
 }

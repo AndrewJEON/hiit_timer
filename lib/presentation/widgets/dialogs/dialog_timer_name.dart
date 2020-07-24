@@ -1,16 +1,21 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as p;
 
 import '../../../core/service_locator.dart';
+import '../../../data/repositories/repository_timer.dart';
 
 class TimerNameDialog extends StatefulWidget {
-  static Future<String> show(BuildContext context) async {
+  final String currentName;
+
+  TimerNameDialog(this.currentName);
+
+  static Future<String> show(
+    BuildContext context, {
+    String currentName,
+  }) async {
     return showDialog(
       context: context,
       builder: (context) {
-        return TimerNameDialog();
+        return TimerNameDialog(currentName);
       },
     );
   }
@@ -26,6 +31,12 @@ class _TimerNameDialogState extends State<TimerNameDialog> {
   bool _isDuplicate = false;
 
   @override
+  void initState() {
+    super.initState();
+    _controller.text = widget.currentName;
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -34,7 +45,7 @@ class _TimerNameDialogState extends State<TimerNameDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Timer Name'),
+      title: Text(widget.currentName == null ? 'Timer Name' : 'Rename'),
       content: SingleChildScrollView(
         child: TextField(
           controller: _controller,
@@ -58,10 +69,11 @@ class _TimerNameDialogState extends State<TimerNameDialog> {
           onPressed: () => Navigator.pop(context, null),
         ),
         FlatButton(
-          child: Text('Save'),
+          child: Text(widget.currentName == null ? 'Save' : 'Rename'),
           onPressed: _isValid
               ? () async {
-                  if (!await isDuplicate(_controller.text)) {
+                  final repo = sl<TimerRepository>();
+                  if (!await repo.isDuplicate(_controller.text)) {
                     Navigator.pop(context, _controller.text);
                   } else {
                     setState(() {
@@ -73,16 +85,5 @@ class _TimerNameDialogState extends State<TimerNameDialog> {
         ),
       ],
     );
-  }
-
-  Future<bool> isDuplicate(String name) async {
-    final timerDir = sl<Directory>();
-    final files = timerDir.list().where((entity) => entity is File).cast<File>();
-    await for (final file in files) {
-      if (p.basenameWithoutExtension(file.path) == name) {
-        return true;
-      }
-    }
-    return false;
   }
 }

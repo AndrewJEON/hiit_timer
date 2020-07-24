@@ -19,8 +19,8 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
   Stream<TimerModel> mapEventToState(
     TimerCreatingEvent event,
   ) async* {
-    if (event is TimerSaved) {
-      yield* _mapTimerSavedToState(event);
+    if (event is TimerCreatingInitialized) {
+      yield* _mapTimerInitializedToState(event);
     } else if (event is TimerSetAdded) {
       yield* _mapTimerSetAddedToState(event);
     } else if (event is TimerSetCopied) {
@@ -52,17 +52,16 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
     }
   }
 
-  Stream<TimerModel> _mapTimerSavedToState(
-    TimerSaved event,
+  Stream<TimerModel> _mapTimerInitializedToState(
+    TimerCreatingInitialized event,
   ) async* {
-    await repository
-        .save(TimerModel(name: event.name, timerSets: state.timerSets));
+    yield event.timer;
   }
 
   Stream<TimerModel> _mapTimerSetAddedToState(
     TimerSetAdded event,
   ) async* {
-    yield TimerModel(
+    yield state.copyWith(
       timerSets: List.of(state.timerSets)..add(TimerSetModel.initial()),
     );
   }
@@ -70,7 +69,7 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
   Stream<TimerModel> _mapTimerSetCopiedToState(
     TimerSetCopied event,
   ) async* {
-    yield TimerModel(
+    yield state.copyWith(
       timerSets: List.of(state.timerSets)
         ..insert(event.index, state.timerSets[event.index]),
     );
@@ -79,7 +78,7 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
   Stream<TimerModel> _mapTimerSetDeletedToState(
     TimerSetDeleted event,
   ) async* {
-    yield TimerModel(
+    yield state.copyWith(
       timerSets: List.of(state.timerSets)..removeAt(event.index),
     );
   }
@@ -89,7 +88,7 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
   ) async* {
     if (event.index > 0) {
       final target = state.timerSets[event.index];
-      yield TimerModel(
+      yield state.copyWith(
         timerSets: List.of(state.timerSets)
           ..removeAt(event.index)
           ..insert(event.index - 1, target),
@@ -102,7 +101,7 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
   ) async* {
     if (event.index < state.timerSets.length - 1) {
       final target = state.timerSets[event.index];
-      yield TimerModel(
+      yield state.copyWith(
         timerSets: List.of(state.timerSets)
           ..removeAt(event.index)
           ..insert(event.index + 1, target),
@@ -115,7 +114,7 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
   ) async* {
     final newTimerSet = state.timerSets[event.index]
         .copyWith(repeatCount: state.timerSets[event.index].repeatCount + 1);
-    yield TimerModel(
+    yield state.copyWith(
       timerSets: List.of(state.timerSets)
         ..removeAt(event.index)
         ..insert(event.index, newTimerSet),
@@ -129,7 +128,7 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
     if (currentRepeatCount > 1) {
       final newTimerSet = state.timerSets[event.index]
           .copyWith(repeatCount: currentRepeatCount - 1);
-      yield TimerModel(
+      yield state.copyWith(
         timerSets: List.of(state.timerSets)
           ..removeAt(event.index)
           ..insert(event.index, newTimerSet),
@@ -144,7 +143,7 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
       timers: List.of(state.timerSets[event.index].timers)
         ..add(TimerPieceModel.initial()),
     );
-    yield TimerModel(
+    yield state.copyWith(
       timerSets: List.of(state.timerSets)
         ..removeAt(event.index)
         ..insert(event.index, newTimerSet),
@@ -161,7 +160,7 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
           state.timerSets[event.setIndex].timers[event.index],
         ),
     );
-    yield TimerModel(
+    yield state.copyWith(
       timerSets: List.of(state.timerSets)
         ..removeAt(event.setIndex)
         ..insert(event.setIndex, newTimerSet),
@@ -175,7 +174,7 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
       timers: List.of(state.timerSets[event.setIndex].timers)
         ..removeAt(event.index),
     );
-    yield TimerModel(
+    yield state.copyWith(
       timerSets: List.of(state.timerSets)
         ..removeAt(event.setIndex)
         ..insert(event.setIndex, newTimerSet),
@@ -192,7 +191,7 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
           ..removeAt(event.index)
           ..insert(event.index - 1, target),
       );
-      yield TimerModel(
+      yield state.copyWith(
         timerSets: List.of(state.timerSets)
           ..removeAt(event.setIndex)
           ..insert(event.setIndex, newTimerSet),
@@ -210,7 +209,7 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
           ..removeAt(event.index)
           ..insert(event.index + 1, target),
       );
-      yield TimerModel(
+      yield state.copyWith(
         timerSets: List.of(state.timerSets)
           ..removeAt(event.setIndex)
           ..insert(event.setIndex, newTimerSet),
@@ -228,7 +227,7 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
         ..removeAt(event.index)
         ..insert(event.index, newTimer),
     );
-    yield TimerModel(
+    yield state.copyWith(
       timerSets: List.of(state.timerSets)
         ..removeAt(event.setIndex)
         ..insert(event.setIndex, newTimerSet),
@@ -245,7 +244,7 @@ class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
         ..removeAt(event.index)
         ..insert(event.index, newTimer),
     );
-    yield TimerModel(
+    yield state.copyWith(
       timerSets: List.of(state.timerSets)
         ..removeAt(event.setIndex)
         ..insert(event.setIndex, newTimerSet),
