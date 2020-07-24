@@ -51,12 +51,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         child: Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(top: 8, left: 16, right: 16),
+              padding: const EdgeInsets.only(top: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   repeatCount(),
-                  timerName(),
+                  Flexible(child: timerName()),
                   resetButton(),
                 ],
               ),
@@ -208,6 +208,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           return Text(
             state.name,
             style: Theme.of(context).textTheme.headline6,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           );
         }
       },
