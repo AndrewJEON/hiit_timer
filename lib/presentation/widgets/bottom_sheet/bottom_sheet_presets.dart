@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../bloc/preset/preset_bloc.dart';
+import '../../../bloc/timer/timer_bloc.dart';
 import '../../../bloc/timer_creating/timer_creating_bloc.dart';
-import '../../../bloc/timer_select/timer_select_bloc.dart';
 import '../../../core/service_locator.dart';
 import '../../../data/models/model_timer.dart';
 import '../../../data/repositories/repository_timer.dart';
@@ -60,7 +60,7 @@ class PresetsBottomSheet extends StatelessWidget {
                         title: Text(sorted[i].name),
                         trailing: options(context, sorted[i]),
                         selected:
-                            sorted[i] == context.bloc<TimerSelectBloc>().state,
+                            sorted[i] == context.bloc<TimerBloc>().currentTimer,
                       );
                     },
                   );

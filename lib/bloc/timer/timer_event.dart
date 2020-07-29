@@ -15,20 +15,26 @@ class TimerPaused extends TimerEvent {}
 
 class TimerResumed extends TimerEvent {}
 
-class TimerReset extends TimerEvent {
-  final TimerModel timer;
-
-  TimerReset({this.timer});
-
-  @override
-  List<Object> get props => [timer];
-}
+class TimerReset extends TimerEvent {}
 
 class TimerTicked extends TimerEvent {
   final Duration remainingTime;
+  final String timerState;
 
-  TimerTicked({@required this.remainingTime});
+  TimerTicked({
+    @required this.remainingTime,
+    @required this.timerState,
+  });
 
   @override
-  List<Object> get props => [remainingTime];
+  List<Object> get props => [remainingTime, timerState];
+}
+
+class TimerSelected extends TimerEvent {
+  final TimerModel timer;
+
+  TimerSelected(this.timer);
+
+  @override
+  List<Object> get props => [timer];
 }

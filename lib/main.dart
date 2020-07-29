@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'bloc/preset/preset_bloc.dart';
 import 'bloc/repeat_count/repeat_count_bloc.dart';
 import 'bloc/timer/timer_bloc.dart';
-import 'bloc/timer_select/timer_select_bloc.dart';
 import 'core/service_locator.dart';
 import 'data/repositories/repository_timer.dart';
 import 'home.dart';
@@ -17,10 +16,6 @@ void main() async {
     repository: sl<TimerRepository>(),
     repeatCountBloc: repeatCountBloc,
   );
-  final timerSelectBloc = TimerSelectBloc(
-    repository: sl<TimerRepository>(),
-    timerBloc: timerBloc,
-  );
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider(
@@ -32,11 +27,8 @@ void main() async {
       BlocProvider(
         create: (context) => PresetBloc(
           repository: sl<TimerRepository>(),
-          timerSelectBloc: timerSelectBloc,
+          timerBloc: timerBloc,
         ),
-      ),
-      BlocProvider(
-        create: (context) => timerSelectBloc,
       ),
     ],
     child: MyApp(),

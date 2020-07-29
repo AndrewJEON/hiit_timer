@@ -6,18 +6,18 @@ import 'package:flutter/material.dart';
 
 import '../../data/models/model_timer.dart';
 import '../../data/repositories/repository_timer.dart';
-import '../timer_select/timer_select_bloc.dart';
+import '../timer/timer_bloc.dart';
 
 part 'preset_event.dart';
 part 'preset_state.dart';
 
 class PresetBloc extends Bloc<PresetEvent, PresetState> {
   final TimerRepository repository;
-  final TimerSelectBloc timerSelectBloc;
+  final TimerBloc timerBloc;
 
   PresetBloc({
     this.repository,
-    this.timerSelectBloc,
+    this.timerBloc,
   }) : super(PresetInitial()) {
     add(PresetInitialized());
   }
@@ -86,8 +86,8 @@ class PresetBloc extends Bloc<PresetEvent, PresetState> {
       ..removeWhere((timer) => timer.name == event.timer.name)
       ..add(newTimer);
     yield PresetSuccess(newTimers);
-    if (timerSelectBloc.state.name == event.timer.name) {
-      timerSelectBloc.add(TimerSelected(newTimer));
+    if (timerBloc.currentTimer.name == event.timer.name) {
+      timerBloc.add(TimerSelected(newTimer));
     }
     await repository.rename(event.timer, newName: event.newName);
   }
@@ -99,8 +99,8 @@ class PresetBloc extends Bloc<PresetEvent, PresetState> {
       ..removeWhere((timer) => timer.name == event.timer.name)
       ..add(event.timer);
     yield PresetSuccess(newTimers);
-    if (timerSelectBloc.state.name == event.timer.name) {
-      timerSelectBloc.add(TimerSelected(event.timer));
+    if (timerBloc.currentTimer.name == event.timer.name) {
+      timerBloc.add(TimerSelected(event.timer));
     }
     await repository.save(event.timer);
   }

@@ -5,9 +5,8 @@ import 'package:flutter_icons/flutter_icons.dart';
 
 import 'bloc/repeat_count/repeat_count_bloc.dart';
 import 'bloc/timer/timer_bloc.dart';
-import 'bloc/timer_select/timer_select_bloc.dart';
+import 'core/foreground_service.dart';
 import 'core/utils.dart';
-import 'data/models/model_timer.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_presets.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_repeat_count.dart';
 
@@ -56,7 +55,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   repeatCount(),
-                  Flexible(child: timerName()),
+                  //Flexible(child: timerName()),
                   resetButton(),
                 ],
               ),
@@ -75,42 +74,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             child: Icon(Icons.fast_rewind, size: 20),
             onPressed: () {},
           ),
-          BlocListener<TimerBloc, TimerState>(
-            listener: (context, state) {
-              if (state is TimerInitial) {
-                _controller.reverse();
-              } else if (state is TimerReady) {
-                _controller.reverse();
-              } else if (state is TimerRunning) {
-                _controller.forward();
-              } else if (state is TimerPause) {
-                _controller.reverse();
-              } else if (state is TimerFinish) {
-                _controller.reverse();
-              } else if (state is TimerFailure) {
-                _controller.reverse();
-              }
-            },
-            child: FloatingActionButton(
-              heroTag: 'play_pause',
-              child: AnimatedIcon(
-                icon: AnimatedIcons.play_pause,
-                progress: _controller,
-              ),
-              onPressed: () {
-                final currentState = context.bloc<TimerBloc>().state;
-                if (currentState is TimerRunning) {
-                  context.bloc<TimerBloc>().add(TimerPaused());
-                } else if (currentState is TimerReady) {
-                  context.bloc<TimerBloc>().add(TimerStarted());
-                } else if (currentState is TimerPause) {
-                  context.bloc<TimerBloc>().add(TimerResumed());
-                } else if (currentState is TimerFinish) {
-                  context.bloc<TimerBloc>().add(TimerStarted());
-                }
-              },
-            ),
-          ),
+          playPauseButton(),
           FloatingActionButton(
             heroTag: 'fast_forward',
             mini: true,
@@ -128,7 +92,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               onPressed: () async {
                 final timer = await PresetsBottomSheet.show(context);
                 if (timer != null) {
-                  context.bloc<TimerSelectBloc>().add(TimerSelected(timer));
+                  context.bloc<TimerBloc>().add(TimerSelected(timer));
                 }
               },
             ),
@@ -199,27 +163,28 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget timerName() {
-    return BlocBuilder<TimerSelectBloc, TimerModel>(
-      builder: (context, state) {
-        if (state == null) {
-          return Container();
-        } else {
-          return Text(
-            state.name,
-            style: Theme.of(context).textTheme.headline6,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          );
-        }
-      },
-    );
-  }
+//  Widget timerName() {
+//    return BlocBuilder<TimerSelectBloc, TimerModel>(
+//      builder: (context, state) {
+//        if (state == null) {
+//          return Container();
+//        } else {
+//          return Text(
+//            state.name,
+//            style: Theme.of(context).textTheme.headline6,
+//            textAlign: TextAlign.center,
+//            maxLines: 2,
+//            overflow: TextOverflow.ellipsis,
+//          );
+//        }
+//      },
+//    );
+//  }
 
   Widget resetButton() {
     return FlatButton.icon(
       onPressed: () {
+        ForegroundService.stop();
         context.bloc<TimerBloc>().add(TimerReset());
       },
       icon: Icon(Icons.refresh),
@@ -252,6 +217,46 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           );
         }
       },
+    );
+  }
+
+  Widget playPauseButton() {
+    return BlocListener<TimerBloc, TimerState>(
+      listener: (context, state) {
+        if (state is TimerInitial) {
+          _controller.reverse();
+        } else if (state is TimerReady) {
+          _controller.reverse();
+        } else if (state is TimerRunning) {
+          _controller.forward();
+        } else if (state is TimerPause) {
+          _controller.reverse();
+        } else if (state is TimerFinish) {
+          _controller.reverse();
+        } else if (state is TimerFailure) {
+          _controller.reverse();
+        }
+      },
+      child: FloatingActionButton(
+        heroTag: 'play_pause',
+        child: AnimatedIcon(
+          icon: AnimatedIcons.play_pause,
+          progress: _controller,
+        ),
+        onPressed: () {
+          final currentState = context.bloc<TimerBloc>().state;
+          if (currentState is TimerRunning) {
+            context.bloc<TimerBloc>().add(TimerPaused());
+          } else if (currentState is TimerReady) {
+            context.bloc<TimerBloc>().add(TimerStarted());
+          } else if (currentState is TimerPause) {
+            ForegroundService.resume();
+            context.bloc<TimerBloc>().add(TimerResumed());
+          } else if (currentState is TimerFinish) {
+            context.bloc<TimerBloc>().add(TimerStarted());
+          }
+        },
+      ),
     );
   }
 }
