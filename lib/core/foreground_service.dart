@@ -62,4 +62,32 @@ class ForegroundService {
       );
     }
   }
+
+  static Future<void> forward(int sec) async {
+    try {
+      await platform.invokeMethod('forward', <String, dynamic>{
+        "forwardDuration": sec,
+      });
+    } on PlatformException catch (e) {
+      debugPrint('ForegroundService forward error: $e');
+      Fluttertoast.showToast(
+        msg: 'Failed to forward the timer',
+        backgroundColor: Colors.black38,
+      );
+    }
+  }
+
+  static Future<void> rewind(int sec) async {
+    try {
+      await platform.invokeMethod('rewind', <String, dynamic>{
+        "rewindDuration": sec,
+      });
+    } on PlatformException catch (e) {
+      debugPrint('ForegroundService rewind error: $e');
+      Fluttertoast.showToast(
+        msg: 'Failed to rewind the timer',
+        backgroundColor: Colors.black38,
+      );
+    }
+  }
 }

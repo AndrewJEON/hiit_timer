@@ -13,8 +13,9 @@ abstract class MyTimer<T>(
 
     private lateinit var timer: Timer
     private var timerState = TimerState.READY
-    private var computationCount = 0
     private val watch = Stopwatch()
+
+    var computationCount = 0
 
     abstract fun onTick(data: T)
 

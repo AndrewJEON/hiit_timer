@@ -58,6 +58,10 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
         yield* _mapTimerResetToState(event);
       } else if (event is TimerTicked) {
         yield* _mapTimerTickedToState(event);
+      } else if (event is TimerForwarded) {
+        yield* _mapTimerForwardedToState(event);
+      } else if (event is TimerRewound) {
+        yield* _mapTimerRewoundToState(event);
       } else if (event is TimerSelected) {
         yield* _mapTimerSelectedToState(event);
       }
@@ -145,5 +149,17 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     ForegroundService.stop();
     _currentTimer = event.timer;
     yield TimerReady(_currentTimer.timerSets[0].timers[0].duration);
+  }
+
+  Stream<TimerState> _mapTimerForwardedToState(
+    TimerForwarded event,
+  ) async* {
+    ForegroundService.forward(5);
+  }
+
+  Stream<TimerState> _mapTimerRewoundToState(
+    TimerRewound event,
+  ) async* {
+    ForegroundService.rewind(5);
   }
 }

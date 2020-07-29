@@ -30,6 +30,10 @@ class TimerTicked extends TimerEvent {
   List<Object> get props => [remainingTime, timerState];
 }
 
+class TimerForwarded extends TimerEvent {}
+
+class TimerRewound extends TimerEvent {}
+
 class TimerSelected extends TimerEvent {
   final TimerModel timer;
 

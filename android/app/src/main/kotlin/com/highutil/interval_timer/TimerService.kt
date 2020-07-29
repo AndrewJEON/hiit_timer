@@ -4,12 +4,14 @@ import android.app.*
 import android.content.Intent
 import android.os.Binder
 import android.os.Build
-import android.os.CountDownTimer
 import android.os.IBinder
+import android.speech.tts.TextToSpeech
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.flutter.app.FlutterApplication
+import java.util.*
 
 class TimerService : Service() {
     companion object {
@@ -24,9 +26,12 @@ class TimerService : Service() {
     private lateinit var notificationManager: NotificationManager
 
     private lateinit var remainingTimes: List<Int>
+    private lateinit var ttses: List<String>
     private lateinit var timer: MyTimer<Int>
+    private lateinit var tts: TextToSpeech
     private var index = 0
     private var repeatCount = 1
+    private var isTtsInitialized = false
 
     private val _remainingTime = MutableLiveData<Int>()
     val remainingTime: LiveData<Int>
@@ -42,10 +47,18 @@ class TimerService : Service() {
         notificationManager = getSystemService(FlutterApplication.NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, createNotification())
+
+        tts = TextToSpeech(this) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                tts.language = Locale.US
+                isTtsInitialized = true
+            }
+        }
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val timesInMillisecond = intent.getIntArrayExtra("times")!!.toList()
+        ttses = intent.getStringArrayExtra("ttses")!!.toList()
         repeatCount = intent.getIntExtra("repeatCount", 1)
         remainingTimes = timesInMillisecond
         index = 0
@@ -80,6 +93,43 @@ class TimerService : Service() {
 
     fun stop() {
         timer.cancel()
+        tts.shutdown()
+    }
+
+    fun forward(sec: Int) {
+        timer.computationCount += sec
+        val result = remainingTimes[index] - timer.computationCount
+        if (result < 1) {
+            if (index < remainingTimes.size - 1) {
+                notificationManager.notify(NOTIFICATION_ID, createNotification(remainingTimes[index + 1]))
+                _remainingTime.value = remainingTimes[index + 1]
+            } else {
+                when {
+                    repeatCount > 1 || repeatCount == -1 -> {
+                        notificationManager.notify(NOTIFICATION_ID, createNotification(remainingTimes[0]))
+                        _remainingTime.value = remainingTimes[0]
+                    }
+                    else -> {
+                        notificationManager.notify(NOTIFICATION_ID, createNotification(finish = true))
+                        _remainingTime.value = -1
+                    }
+                }
+            }
+        } else {
+            notificationManager.notify(NOTIFICATION_ID, createNotification(result))
+            _remainingTime.value = result
+        }
+    }
+
+    fun rewind(sec: Int) {
+        if (remainingTimes[index] - (timer.computationCount - sec) > remainingTimes[index]) {
+            timer.computationCount = 0
+        } else {
+            timer.computationCount -= sec
+        }
+        val result = remainingTimes[index] - timer.computationCount
+        notificationManager.notify(NOTIFICATION_ID, createNotification(result))
+        _remainingTime.value = result
     }
 
     private fun tick(data: Int) {
@@ -87,6 +137,10 @@ class TimerService : Service() {
             notificationManager.notify(NOTIFICATION_ID, createNotification(data))
             _remainingTime.postValue(data)
         } else {
+            if (isTtsInitialized) {
+                tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
+            }
+
             if (index < remainingTimes.size - 1) {
                 val remainingTime = remainingTimes[++index]
                 notificationManager.notify(NOTIFICATION_ID, createNotification(remainingTime))

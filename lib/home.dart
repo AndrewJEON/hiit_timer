@@ -72,14 +72,18 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             heroTag: 'fast_rewind',
             mini: true,
             child: Icon(Icons.fast_rewind, size: 20),
-            onPressed: () {},
+            onPressed: () {
+              context.bloc<TimerBloc>().add(TimerRewound());
+            },
           ),
           playPauseButton(),
           FloatingActionButton(
             heroTag: 'fast_forward',
             mini: true,
             child: Icon(Icons.fast_forward, size: 20),
-            onPressed: () {},
+            onPressed: () {
+              context.bloc<TimerBloc>().add(TimerForwarded());
+            },
           ),
         ],
       ),
