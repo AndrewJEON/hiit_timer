@@ -98,6 +98,9 @@ class TimerSetView extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
+        SizedBox(width: 8),
+        Icon(Icons.repeat),
+        SizedBox(width: 8),
         Container(
           width: 24,
           height: 24,

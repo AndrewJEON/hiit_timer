@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:meta/meta.dart';
 
 import '../../../bloc/timer_creating/timer_creating_bloc.dart';
-import '../../../core/utils.dart';
-import '../../../data/models/model_timer.dart';
 import '../../../data/models/model_timer_piece.dart';
 
 class TimerOptions {
@@ -33,17 +31,123 @@ class TimerView extends StatefulWidget {
 }
 
 class _TimerViewState extends State<TimerView> {
-  final _controller = TextEditingController();
+  final _hourController = TextEditingController();
+  final _minuteController = TextEditingController();
+  final _secondController = TextEditingController();
+  final _ttsController = TextEditingController();
+
+  final _hourFocusNode = FocusNode();
+  final _minuteFocusNode = FocusNode();
+  final _secondFocusNode = FocusNode();
+  final _ttsFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _controller.text = widget.timer.description;
+    _hourController.text =
+        widget.timer.duration.inHours.toString().padLeft(2, '0');
+    _minuteController.text = widget.timer.duration.inMinutes
+        .remainder(60)
+        .toString()
+        .padLeft(2, '0');
+    _secondController.text = widget.timer.duration.inSeconds
+        .remainder(60)
+        .toString()
+        .padLeft(2, '0');
+    _ttsController.text = widget.timer.description;
+
+    _hourFocusNode.addListener(() {
+      if (_hourFocusNode.hasFocus) {
+        _hourController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _hourController.text.length,
+        );
+      }
+      if (_hourController.text.length < 2) {
+        _hourController.text = _hourController.text.padLeft(2, '0');
+      }
+      context.bloc<TimerCreatingBloc>().add(
+            TimerDurationChanged(
+              duration: Duration(
+                hours: int.tryParse(_hourController.text),
+                minutes: int.tryParse(_minuteController.text),
+                seconds: int.tryParse(_secondController.text),
+              ),
+              setIndex: widget.setIndex,
+              index: widget.index,
+            ),
+          );
+    });
+    _minuteFocusNode.addListener(() {
+      if (_minuteFocusNode.hasFocus) {
+        _minuteController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _minuteController.text.length,
+        );
+      }
+      if (_minuteController.text.length < 2) {
+        _minuteController.text = _minuteController.text.padLeft(2, '0');
+      }
+      if (int.tryParse(_minuteController.text) >= 60) {
+        _minuteController.text = '59';
+      }
+      context.bloc<TimerCreatingBloc>().add(
+            TimerDurationChanged(
+              duration: Duration(
+                hours: int.tryParse(_hourController.text),
+                minutes: int.tryParse(_minuteController.text),
+                seconds: int.tryParse(_secondController.text),
+              ),
+              setIndex: widget.setIndex,
+              index: widget.index,
+            ),
+          );
+    });
+    _secondFocusNode.addListener(() {
+      if (_secondFocusNode.hasFocus) {
+        _secondController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _secondController.text.length,
+        );
+      }
+      if (_secondController.text.length < 2) {
+        _secondController.text = _secondController.text.padLeft(2, '0');
+      }
+      if (int.tryParse(_secondController.text) >= 60) {
+        _secondController.text = '59';
+      }
+      context.bloc<TimerCreatingBloc>().add(
+            TimerDurationChanged(
+              duration: Duration(
+                hours: int.tryParse(_hourController.text),
+                minutes: int.tryParse(_minuteController.text),
+                seconds: int.tryParse(_secondController.text),
+              ),
+              setIndex: widget.setIndex,
+              index: widget.index,
+            ),
+          );
+    });
+    _ttsFocusNode.addListener(() {
+      if (_ttsFocusNode.hasFocus) {
+        _ttsController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _ttsController.text.length,
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _ttsFocusNode.dispose();
+    _secondFocusNode.dispose();
+    _minuteFocusNode.dispose();
+    _hourFocusNode.dispose();
+    _ttsController.dispose();
+    _secondController.dispose();
+    _minuteController.dispose();
+    _hourController.dispose();
     super.dispose();
   }
 
@@ -70,7 +174,8 @@ class _TimerViewState extends State<TimerView> {
 
   Widget description() {
     return TextField(
-      controller: _controller,
+      controller: _ttsController,
+      focusNode: _ttsFocusNode,
       maxLines: null,
       textInputAction: TextInputAction.done,
       onChanged: (value) {
@@ -86,54 +191,76 @@ class _TimerViewState extends State<TimerView> {
   }
 
   Widget duration() {
-    return BlocBuilder<TimerCreatingBloc, TimerModel>(
-      buildWhen: (previous, current) {
-        try {
-          if (previous
-                  .timerSets[widget.setIndex].timers[widget.index].duration !=
-              current
-                  .timerSets[widget.setIndex].timers[widget.index].duration) {
-            return true;
-          } else {
-            return false;
-          }
-        } on RangeError {
-          return false;
-        }
-      },
-      builder: (context, state) {
-        final duration =
-            state.timerSets[widget.setIndex].timers[widget.index].duration;
-        return FlatButton(
-          onPressed: () async {
-            final dateTime = await DatePicker.showTimePicker(
-              context,
-              currentTime: DateTime(
-                0,
-                0,
-                0,
-                duration.inHours,
-                duration.inMinutes.remainder(60),
-                duration.inSeconds.remainder(60),
-              ),
-            );
-            if (dateTime != null) {
-              context.bloc<TimerCreatingBloc>().add(
-                    TimerDurationChanged(
-                      duration: Duration(
-                        hours: dateTime.hour,
-                        minutes: dateTime.minute,
-                        seconds: dateTime.second,
-                      ),
-                      setIndex: widget.setIndex,
-                      index: widget.index,
-                    ),
-                  );
-            }
-          },
-          child: Text(formatDuration(duration, showHour: true)),
-        );
-      },
+    return Container(
+      width: 128,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Expanded(
+            child: TextField(
+              controller: _hourController,
+              focusNode: _hourFocusNode,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(2),
+                WhitelistingTextInputFormatter.digitsOnly,
+              ],
+              textAlign: TextAlign.end,
+              cursorWidth: 0,
+              onSubmitted: (value) => FocusScope.of(context).nextFocus(),
+              onChanged: (value) {
+                if (value.length == 2) {
+                  FocusScope.of(context).nextFocus();
+                }
+              },
+            ),
+          ),
+          Expanded(child: Text(':', textAlign: TextAlign.center)),
+          Expanded(
+            child: TextField(
+              controller: _minuteController,
+              focusNode: _minuteFocusNode,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(2),
+                WhitelistingTextInputFormatter.digitsOnly,
+              ],
+              textAlign: TextAlign.end,
+              cursorWidth: 0,
+              onSubmitted: (value) => FocusScope.of(context).nextFocus(),
+              onChanged: (value) {
+                if (value.length == 2) {
+                  FocusScope.of(context).nextFocus();
+                }
+              },
+            ),
+          ),
+          Expanded(child: Text(':', textAlign: TextAlign.center)),
+          Expanded(
+            child: TextField(
+              controller: _secondController,
+              focusNode: _secondFocusNode,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(2),
+                WhitelistingTextInputFormatter.digitsOnly,
+              ],
+              textAlign: TextAlign.end,
+              cursorWidth: 0,
+              onSubmitted: (value) => FocusScope.of(context).nextFocus(),
+              onChanged: (value) {
+                if (value.length == 2) {
+                  FocusScope.of(context).nextFocus();
+                }
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
