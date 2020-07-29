@@ -2,11 +2,12 @@ package com.highutil.interval_timer
 
 import android.app.*
 import android.content.Intent
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.speech.tts.TextToSpeech
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -29,6 +30,7 @@ class TimerService : Service() {
     private lateinit var ttses: List<String>
     private lateinit var timer: MyTimer<Int>
     private lateinit var tts: TextToSpeech
+    private lateinit var toneGenerator: ToneGenerator
     private var index = 0
     private var repeatCount = 1
     private var isTtsInitialized = false
@@ -54,6 +56,7 @@ class TimerService : Service() {
                 isTtsInitialized = true
             }
         }
+        toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -94,6 +97,7 @@ class TimerService : Service() {
     fun stop() {
         timer.cancel()
         tts.shutdown()
+        toneGenerator.release()
     }
 
     fun forward(sec: Int) {
@@ -134,11 +138,23 @@ class TimerService : Service() {
 
     private fun tick(data: Int) {
         if (data > 0) {
+            if (isTtsInitialized) {
+                when (data) {
+                    3 -> tts.speak("3", TextToSpeech.QUEUE_FLUSH, null, "")
+                    2 -> tts.speak("2", TextToSpeech.QUEUE_FLUSH, null, "")
+                    1 -> tts.speak("1", TextToSpeech.QUEUE_FLUSH, null, "")
+                }
+            }
+
             notificationManager.notify(NOTIFICATION_ID, createNotification(data))
             _remainingTime.postValue(data)
         } else {
-            if (isTtsInitialized) {
-                tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
+            if(ttses[index].isEmpty()) {
+                toneGenerator.startTone(ToneGenerator.TONE_CDMA_PIP, 150)
+            } else {
+                if (isTtsInitialized) {
+                    tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
+                }
             }
 
             if (index < remainingTimes.size - 1) {
