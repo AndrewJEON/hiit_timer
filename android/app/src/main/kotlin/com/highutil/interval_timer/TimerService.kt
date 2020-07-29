@@ -155,7 +155,6 @@ class TimerService : Service() {
         } else {
             if (index < remainingTimes.size - 1) {
                 val remainingTime = remainingTimes[++index]
-                notificationManager.notify(NOTIFICATION_ID, createNotification(remainingTime))
                 timer.cancel()
                 timer = object : MyTimer<Int>(1000L, { x -> remainingTimes[index] - x - 1 }) {
                     override fun onTick(data: Int) {
@@ -171,6 +170,8 @@ class TimerService : Service() {
                         tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
                     }
                 }
+
+                notificationManager.notify(NOTIFICATION_ID, createNotification(remainingTime))
                 _remainingTime.postValue(remainingTime)
             } else {
                 when {
@@ -178,7 +179,6 @@ class TimerService : Service() {
                         repeatCount--
                         index = 0
                         val remainingTime = remainingTimes[index]
-                        notificationManager.notify(NOTIFICATION_ID, createNotification(remainingTime))
                         timer.cancel()
                         timer = object : MyTimer<Int>(1000L, { x -> remainingTimes[index] - x - 1 }) {
                             override fun onTick(data: Int) {
@@ -194,12 +194,13 @@ class TimerService : Service() {
                                 tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
                             }
                         }
+
+                        notificationManager.notify(NOTIFICATION_ID, createNotification(remainingTime))
                         _remainingTime.postValue(remainingTime)
                     }
                     repeatCount == -1 -> {
                         index = 0
                         val remainingTime = remainingTimes[index]
-                        notificationManager.notify(NOTIFICATION_ID, createNotification(remainingTime))
                         timer.cancel()
                         timer = object : MyTimer<Int>(1000L, { x -> remainingTimes[index] - x - 1 }) {
                             override fun onTick(data: Int) {
@@ -215,13 +216,15 @@ class TimerService : Service() {
                                 tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
                             }
                         }
+
+                        notificationManager.notify(NOTIFICATION_ID, createNotification(remainingTime))
                         _remainingTime.postValue(remainingTime)
                     }
                     else -> {
-                        notificationManager.notify(NOTIFICATION_ID, createNotification(finish = true))
                         timer.cancel()
                         currentTts = ttses[index]
                         tts.speak("Done", TextToSpeech.QUEUE_FLUSH, null, "")
+                        notificationManager.notify(NOTIFICATION_ID, createNotification(finish = true))
                         _remainingTime.postValue(-1)
                     }
                 }
@@ -249,12 +252,14 @@ class TimerService : Service() {
         return if (finish) {
             NotificationCompat.Builder(this, CHANNEL_ID)
                     .setContentTitle("Done")
+                    .setContentText(currentTts)
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentIntent(pendingIntent)
                     .build()
         } else {
             NotificationCompat.Builder(this, CHANNEL_ID)
                     .setContentTitle(formattedTime)
+                    .setContentText(currentTts)
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentIntent(pendingIntent)
                     .build()
