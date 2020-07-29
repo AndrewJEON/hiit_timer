@@ -19,15 +19,17 @@ class TimerReset extends TimerEvent {}
 
 class TimerTicked extends TimerEvent {
   final Duration remainingTime;
-  final String timerState;
+  final bool isRunning;
+  final String tts;
 
   TimerTicked({
     @required this.remainingTime,
-    @required this.timerState,
+    @required this.isRunning,
+    @required this.tts,
   });
 
   @override
-  List<Object> get props => [remainingTime, timerState];
+  List<Object> get props => [remainingTime, isRunning, tts];
 }
 
 class TimerForwarded extends TimerEvent {}

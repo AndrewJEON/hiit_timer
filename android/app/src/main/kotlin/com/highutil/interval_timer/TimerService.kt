@@ -39,7 +39,8 @@ class TimerService : Service() {
     val remainingTime: LiveData<Int>
         get() = _remainingTime
 
-    var timerState = STATE_RUNNING
+    var isRunning = false
+    var currentTts = ""
 
 
     override fun onCreate() {
@@ -50,12 +51,7 @@ class TimerService : Service() {
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, createNotification())
 
-        tts = TextToSpeech(this) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                tts.language = Locale.US
-                isTtsInitialized = true
-            }
-        }
+
         toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
     }
 
@@ -71,7 +67,16 @@ class TimerService : Service() {
             }
         }
         timer.start()
-        timerState = STATE_RUNNING
+        isRunning = true
+
+        tts = TextToSpeech(this) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                tts.language = Locale.US
+                tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
+                isTtsInitialized = true
+            }
+        }
+        currentTts = ttses[0]
         return START_NOT_STICKY
     }
 
@@ -86,12 +91,12 @@ class TimerService : Service() {
 
     fun pause() {
         timer.pause()
-        timerState = STATE_PAUSE
+        isRunning = false
     }
 
     fun resume() {
         timer.resume()
-        timerState = STATE_RUNNING
+        isRunning = true
     }
 
     fun stop() {
@@ -145,18 +150,9 @@ class TimerService : Service() {
                     1 -> tts.speak("1", TextToSpeech.QUEUE_FLUSH, null, "")
                 }
             }
-
             notificationManager.notify(NOTIFICATION_ID, createNotification(data))
             _remainingTime.postValue(data)
         } else {
-            if(ttses[index].isEmpty()) {
-                toneGenerator.startTone(ToneGenerator.TONE_CDMA_PIP, 150)
-            } else {
-                if (isTtsInitialized) {
-                    tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
-                }
-            }
-
             if (index < remainingTimes.size - 1) {
                 val remainingTime = remainingTimes[++index]
                 notificationManager.notify(NOTIFICATION_ID, createNotification(remainingTime))
@@ -167,6 +163,14 @@ class TimerService : Service() {
                     }
                 }
                 timer.start()
+                currentTts = ttses[index]
+                if (ttses[index].isEmpty()) {
+                    toneGenerator.startTone(ToneGenerator.TONE_CDMA_PIP, 150)
+                } else {
+                    if (isTtsInitialized) {
+                        tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
+                    }
+                }
                 _remainingTime.postValue(remainingTime)
             } else {
                 when {
@@ -182,6 +186,14 @@ class TimerService : Service() {
                             }
                         }
                         timer.start()
+                        currentTts = ttses[index]
+                        if (ttses[index].isEmpty()) {
+                            toneGenerator.startTone(ToneGenerator.TONE_CDMA_PIP, 150)
+                        } else {
+                            if (isTtsInitialized) {
+                                tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
+                            }
+                        }
                         _remainingTime.postValue(remainingTime)
                     }
                     repeatCount == -1 -> {
@@ -195,11 +207,21 @@ class TimerService : Service() {
                             }
                         }
                         timer.start()
+                        currentTts = ttses[index]
+                        if (ttses[index].isEmpty()) {
+                            toneGenerator.startTone(ToneGenerator.TONE_CDMA_PIP, 150)
+                        } else {
+                            if (isTtsInitialized) {
+                                tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
+                            }
+                        }
                         _remainingTime.postValue(remainingTime)
                     }
                     else -> {
                         notificationManager.notify(NOTIFICATION_ID, createNotification(finish = true))
                         timer.cancel()
+                        currentTts = ttses[index]
+                        tts.speak("Done", TextToSpeech.QUEUE_FLUSH, null, "")
                         _remainingTime.postValue(-1)
                     }
                 }

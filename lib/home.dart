@@ -10,16 +10,6 @@ import 'core/utils.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_presets.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_repeat_count.dart';
 
-class RepeatCountOptions {
-  static const x2 = '2x';
-  static const x3 = '3x';
-  static const x4 = '4x';
-  static const x5 = '5x';
-  static const infinite = 'Infinite';
-  static const custom = 'Custom';
-  static const all = [x2, x3, x4, x5, infinite, custom];
-}
-
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -55,11 +45,18 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   repeatCount(),
-                  //Flexible(child: timerName()),
+                  Flexible(child: timerName()),
                   resetButton(),
                 ],
               ),
             ),
+            Divider(),
+            Container(
+              height: 32,
+              alignment: Alignment.center,
+              child: tts(),
+            ),
+            Divider(),
             Expanded(child: remainingTime()),
           ],
         ),
@@ -167,23 +164,44 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
-//  Widget timerName() {
-//    return BlocBuilder<TimerSelectBloc, TimerModel>(
-//      builder: (context, state) {
-//        if (state == null) {
-//          return Container();
-//        } else {
-//          return Text(
-//            state.name,
-//            style: Theme.of(context).textTheme.headline6,
-//            textAlign: TextAlign.center,
-//            maxLines: 2,
-//            overflow: TextOverflow.ellipsis,
-//          );
-//        }
-//      },
-//    );
-//  }
+  Widget timerName() {
+    return BlocBuilder<TimerBloc, TimerState>(
+      builder: (context, state) {
+        if (state is TimerInitial) {
+          return Container();
+        } else {
+          return Text(
+            state.name,
+            style: Theme.of(context).textTheme.headline6,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          );
+        }
+      },
+    );
+  }
+
+  Widget tts() {
+    return BlocBuilder<TimerBloc, TimerState>(
+      builder: (context, state) {
+        if (state is TimerInitial) {
+          return Container();
+        } else {
+          return Text(
+            state.tts,
+            style: Theme.of(context)
+                .textTheme
+                .headline6
+                .copyWith(color: Theme.of(context).primaryColor),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          );
+        }
+      },
+    );
+  }
 
   Widget resetButton() {
     return FlatButton.icon(

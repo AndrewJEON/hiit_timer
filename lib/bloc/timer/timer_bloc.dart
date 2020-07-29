@@ -79,14 +79,19 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
       yield TimerFailure.noSavedTimer();
       return;
     }
-    yield TimerReady(_currentTimer.timerSets[0].timers[0].duration);
+    yield TimerReady(
+      remainingTime: _currentTimer.timerSets[0].timers[0].duration,
+      name: _currentTimer.name,
+      tts: _currentTimer.timerSets[0].timers[0].description,
+    );
     ForegroundService.platform.setMethodCallHandler((call) async {
       switch (call.method) {
         case 'tick':
           final data = call.arguments as Map;
           add(TimerTicked(
             remainingTime: Duration(seconds: data["remainingTime"]),
-            timerState: data["timerState"],
+            isRunning: data["isRunning"],
+            tts: data["tts"],
           ));
           return true;
           break;
@@ -105,40 +110,67 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     final ttses = flattened.map((e) => e.description).toList();
     final repeatCount = repeatCountBloc.state;
     ForegroundService.start(times, ttses, repeatCount);
-    yield TimerRunning(_currentTimer.timerSets[0].timers[0].duration);
+    yield TimerRunning(
+      remainingTime: _currentTimer.timerSets[0].timers[0].duration,
+      name: state.name,
+      tts: state.tts,
+    );
   }
 
   Stream<TimerState> _mapTimerPausedToState(
     TimerPaused event,
   ) async* {
     ForegroundService.pause();
-    yield TimerPause(state.remainingTime);
+    yield TimerPause(
+      remainingTime: state.remainingTime,
+      name: state.name,
+      tts: state.tts,
+    );
   }
 
   Stream<TimerState> _mapTimerResumedToState(
     TimerResumed event,
   ) async* {
     ForegroundService.resume();
-    yield TimerRunning(state.remainingTime);
+    yield TimerRunning(
+      remainingTime: state.remainingTime,
+      name: state.name,
+      tts: state.tts,
+    );
   }
 
   Stream<TimerState> _mapTimerResetToState(
     TimerReset event,
   ) async* {
     ForegroundService.stop();
-    yield TimerReady(_currentTimer.timerSets[0].timers[0].duration);
+    yield TimerReady(
+      remainingTime: _currentTimer.timerSets[0].timers[0].duration,
+      name: _currentTimer.name,
+      tts: _currentTimer.timerSets[0].timers[0].description,
+    );
   }
 
   Stream<TimerState> _mapTimerTickedToState(
     TimerTicked event,
   ) async* {
     if (event.remainingTime.inSeconds == -1) {
-      yield TimerFinish();
+      yield TimerFinish(
+        name: state.name,
+        tts: event.tts,
+      );
     } else {
-      if (event.timerState == "STATE_RUNNING") {
-        yield TimerRunning(event.remainingTime);
+      if (event.isRunning) {
+        yield TimerRunning(
+          remainingTime: event.remainingTime,
+          name: state.name,
+          tts: event.tts,
+        );
       } else {
-        yield TimerPause(event.remainingTime);
+        yield TimerPause(
+          remainingTime: event.remainingTime,
+          name: state.name,
+          tts: event.tts,
+        );
       }
     }
   }
@@ -148,7 +180,12 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   ) async* {
     ForegroundService.stop();
     _currentTimer = event.timer;
-    yield TimerReady(_currentTimer.timerSets[0].timers[0].duration);
+    yield TimerReady(
+      remainingTime: _currentTimer.timerSets[0].timers[0].duration,
+      name: _currentTimer.name,
+      tts: _currentTimer.timerSets[0].timers[0].description,
+    );
+    await repository.saveCurrentTimer(event.timer);
   }
 
   Stream<TimerState> _mapTimerForwardedToState(

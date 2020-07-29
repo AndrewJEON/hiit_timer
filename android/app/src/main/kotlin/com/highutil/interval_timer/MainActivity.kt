@@ -30,7 +30,7 @@ class MainActivity : FlutterActivity() {
             val binder = service as TimerService.TimerBinder
             this@MainActivity.service = binder.getService()
             this@MainActivity.service.remainingTime.observe(this@MainActivity, Observer {
-                val data = mapOf("remainingTime" to it, "timerState" to this@MainActivity.service.timerState)
+                val data = mapOf("remainingTime" to it, "isRunning" to this@MainActivity.service.isRunning, "tts" to this@MainActivity.service.currentTts)
                 MethodChannel(flutterEngine?.dartExecutor?.binaryMessenger, CHANNEL).invokeMethod("tick", data)
             })
             isBound = true
