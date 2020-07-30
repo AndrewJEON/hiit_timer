@@ -69,7 +69,8 @@ class TimerSetView extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     child: Row(
                       children: <Widget>[
                         Container(
@@ -79,28 +80,73 @@ class TimerSetView extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
                               Expanded(
-                                child: Text('H', textAlign: TextAlign.center),
+                                child: Text(
+                                  'H',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      .copyWith(fontWeight: FontWeight.w900),
+                                ),
                               ),
                               Expanded(
-                                child: Text(':', textAlign: TextAlign.center),
+                                child: Text(
+                                  ':',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      .copyWith(fontWeight: FontWeight.w900),
+                                ),
                               ),
                               Expanded(
-                                child: Text('M', textAlign: TextAlign.center),
+                                child: Text(
+                                  'M',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      .copyWith(fontWeight: FontWeight.w900),
+                                ),
                               ),
                               Expanded(
-                                child: Text(':', textAlign: TextAlign.center),
+                                child: Text(
+                                  ':',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      .copyWith(fontWeight: FontWeight.w900),
+                                ),
                               ),
                               Expanded(
-                                child: Text('S', textAlign: TextAlign.center),
+                                child: Text(
+                                  'S',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      .copyWith(fontWeight: FontWeight.w900),
+                                ),
                               ),
                             ],
                           ),
                         ),
                         Flexible(
-                          child: Text('Text-To-Speech'),
+                          child: Text(
+                            'Text-To-Speech',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText1
+                                .copyWith(fontWeight: FontWeight.w900),
+                          ),
                         ),
                       ],
                     ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Divider(),
                   ),
                   for (var i = 0; i < state.timerSets[index].timers.length; i++)
                     Padding(

@@ -54,8 +54,18 @@ class MyApp extends StatelessWidget {
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
       ),
+      cardTheme: CardTheme(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        )
+      ),
       inputDecorationTheme: InputDecorationTheme(
         border: InputBorder.none,
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        )
       ),
       visualDensity: VisualDensity.adaptivePlatformDensity,
     );

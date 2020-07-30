@@ -166,7 +166,7 @@ class _TimerViewState extends State<TimerView> {
         ],
       ),
       decoration: BoxDecoration(
-        color: Colors.grey,
+        color: Colors.grey[300],
         borderRadius: BorderRadius.circular(8),
       ),
     );
