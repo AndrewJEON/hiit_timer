@@ -37,7 +37,7 @@ class _DurationDialogState extends State<DurationDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Duration In Seconds'),
+      title: Text('Duration'),
       content: SingleChildScrollView(
         child: TextField(
           controller: _controller,
