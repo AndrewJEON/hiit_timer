@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import 'model_timer_piece.dart';
 import 'model_timer_set.dart';
 
 class TimerModel extends Equatable {
@@ -11,6 +12,33 @@ class TimerModel extends Equatable {
   TimerModel.initial()
       : name = '',
         timerSets = [TimerSetModel.initial()];
+
+  TimerModel.example()
+      : name = 'Example',
+        timerSets = [
+          TimerSetModel(
+            timers: [
+              TimerPieceModel(
+                duration: Duration(seconds: 5),
+                description: 'Ready',
+              ),
+            ],
+            repeatCount: 1,
+          ),
+          TimerSetModel(
+            timers: [
+              TimerPieceModel(
+                duration: Duration(seconds: 20),
+                description: 'Work',
+              ),
+              TimerPieceModel(
+                duration: Duration(seconds: 5),
+                description: 'Rest',
+              ),
+            ],
+            repeatCount: 3,
+          ),
+        ];
 
   TimerModel.fromJson(Map<String, dynamic> json, String name)
       : name = name,

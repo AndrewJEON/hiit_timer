@@ -15,7 +15,6 @@ import '../../data/repositories/repository_timer.dart';
 import '../repeat_count/repeat_count_bloc.dart';
 
 part 'timer_event.dart';
-
 part 'timer_state.dart';
 
 class TimerBloc extends Bloc<TimerEvent, TimerState> {
@@ -79,6 +78,12 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   Stream<TimerState> _mapTimerInitializedToState(
     TimerInitialized event,
   ) async* {
+    if (prefs.getBool(PrefsKeys.firstOpen) ?? true) {
+      _currentTimer = TimerModel.example();
+      await repository.save(_currentTimer);
+      await repository.saveLatestTimer(_currentTimer);
+      prefs.setBool(PrefsKeys.firstOpen, false);
+    }
     _currentTimer = await repository.loadLatestTimer();
     if (_currentTimer == null) {
       yield TimerFailure.noSavedTimer();
@@ -200,7 +205,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
       name: _currentTimer.name,
       tts: _currentTimer.timerSets[0].timers[0].description,
     );
-    await repository.saveCurrentTimer(event.timer);
+    await repository.saveLatestTimer(event.timer);
   }
 
   Stream<TimerState> _mapTimerForwardedToState(

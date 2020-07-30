@@ -65,7 +65,7 @@ class TimerRepository {
     return null;
   }
 
-  Future<void> saveCurrentTimer(TimerModel timer) async {
+  Future<void> saveLatestTimer(TimerModel timer) async {
     prefs.setString(latestTimerKey, timer.name);
   }
 
