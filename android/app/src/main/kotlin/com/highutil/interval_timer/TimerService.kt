@@ -54,7 +54,7 @@ class TimerService : Service() {
         startForeground(NOTIFICATION_ID, createNotification())
 
 
-        toneGenerator = ToneGenerator(AudioManager.STREAM_ALARM, 100)
+        toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -167,7 +167,7 @@ class TimerService : Service() {
                 timer.start()
                 currentTts = ttses[index]
                 if (ttses[index].isEmpty()) {
-                    toneGenerator.startTone(ToneGenerator.TONE_CDMA_PIP, 150)
+                    toneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 1000)
                 } else {
                     if (isTtsInitialized) {
                         tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
@@ -191,7 +191,7 @@ class TimerService : Service() {
                         timer.start()
                         currentTts = ttses[index]
                         if (ttses[index].isEmpty()) {
-                            toneGenerator.startTone(ToneGenerator.TONE_CDMA_PIP, 150)
+                            toneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 1000)
                         } else {
                             if (isTtsInitialized) {
                                 tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
@@ -213,7 +213,7 @@ class TimerService : Service() {
                         timer.start()
                         currentTts = ttses[index]
                         if (ttses[index].isEmpty()) {
-                            toneGenerator.startTone(ToneGenerator.TONE_CDMA_PIP, 150)
+                            toneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 1000)
                         } else {
                             if (isTtsInitialized) {
                                 tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")

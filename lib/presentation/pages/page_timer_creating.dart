@@ -17,16 +17,6 @@ class TimerCreatingPage extends StatefulWidget {
 
 class _TimerCreatingPageState extends State<TimerCreatingPage> {
   @override
-  void initState() {
-    super.initState();
-    if (widget.timer != null) {
-      context
-          .bloc<TimerCreatingBloc>()
-          .add(TimerCreatingInitialized(widget.timer));
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

@@ -13,7 +13,8 @@ part 'timer_creating_event.dart';
 class TimerCreatingBloc extends Bloc<TimerCreatingEvent, TimerModel> {
   final TimerRepository repository;
 
-  TimerCreatingBloc(this.repository) : super(TimerModel.initial());
+  TimerCreatingBloc(this.repository, {TimerModel timer})
+      : super(timer ?? TimerModel.initial());
 
   @override
   Stream<TimerModel> mapEventToState(

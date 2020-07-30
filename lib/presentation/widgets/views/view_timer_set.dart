@@ -41,22 +41,26 @@ class TimerSetView extends StatelessWidget {
           Divider(),
           BlocBuilder<TimerCreatingBloc, TimerModel>(
             buildWhen: (previous, current) {
-              if (previous.timerSets[index].timers.length !=
-                  current.timerSets[index].timers.length) {
-                return true;
-              } else {
-                var count = 0;
-                for (var i = 0;
-                    i < previous.timerSets[index].timers.length;
-                    i++) {
-                  if (previous.timerSets[index].timers[i] !=
-                      current.timerSets[index].timers[i]) {
-                    count++;
-                    if (count >= 2) {
-                      return true;
+              try {
+                if (previous.timerSets[index].timers.length !=
+                    current.timerSets[index].timers.length) {
+                  return true;
+                } else {
+                  var count = 0;
+                  for (var i = 0;
+                  i < previous.timerSets[index].timers.length;
+                  i++) {
+                    if (previous.timerSets[index].timers[i] !=
+                        current.timerSets[index].timers[i]) {
+                      count++;
+                      if (count >= 2) {
+                        return true;
+                      }
                     }
                   }
+                  return false;
                 }
+              } on RangeError {
                 return false;
               }
             },
@@ -117,10 +121,14 @@ class TimerSetView extends StatelessWidget {
         ),
         BlocBuilder<TimerCreatingBloc, TimerModel>(
           buildWhen: (previous, current) {
-            if (previous.timerSets[index].repeatCount !=
-                current.timerSets[index].repeatCount) {
-              return true;
-            } else {
+            try {
+              if (previous.timerSets[index].repeatCount !=
+                  current.timerSets[index].repeatCount) {
+                return true;
+              } else {
+                return false;
+              }
+            } on RangeError {
               return false;
             }
           },

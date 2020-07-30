@@ -130,6 +130,7 @@ class PresetsBottomSheet extends StatelessWidget {
                 builder: (context) => BlocProvider(
                   create: (context) => TimerCreatingBloc(
                     sl<TimerRepository>(),
+                    timer: timer,
                   ),
                   child: TimerCreatingPage(timer: timer),
                 ),
