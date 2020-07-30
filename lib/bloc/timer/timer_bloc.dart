@@ -15,6 +15,7 @@ import '../../data/repositories/repository_timer.dart';
 import '../repeat_count/repeat_count_bloc.dart';
 
 part 'timer_event.dart';
+
 part 'timer_state.dart';
 
 class TimerBloc extends Bloc<TimerEvent, TimerState> {
@@ -115,6 +116,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     final repeatCount = repeatCountBloc.state;
     final settings = <String, dynamic>{
       'warning3Remaining': prefs.getBool(PrefsKeys.warning3Remaining) ?? true,
+      'vibration': prefs.getBool(PrefsKeys.vibration) ?? false,
     };
     ForegroundService.start(times, ttses, repeatCount, settings);
     yield TimerRunning(

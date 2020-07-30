@@ -70,8 +70,9 @@ class MainActivity : FlutterActivity() {
                         intent.putExtra("times", timesInMillisecond)
                         intent.putExtra("ttses", call.argument<List<String>>("ttses")?.toTypedArray())
                         intent.putExtra("repeatCount", call.argument<Int>("repeatCount"))
-                        val settings = call.argument<HashMap<String, Any>>("settings")
-                        intent.putExtra("warning3Remaining", settings?.get("warning3Remaining") as Boolean)
+                        val settings = call.argument<HashMap<String, Any>>("settings")!!
+                        intent.putExtra("warning3Remaining", settings["warning3Remaining"] as Boolean)
+                        intent.putExtra("vibration", settings["vibration"] as Boolean)
                         ContextCompat.startForegroundService(this, intent)
                         bindService(intent, connection, Context.BIND_AUTO_CREATE)
                     }

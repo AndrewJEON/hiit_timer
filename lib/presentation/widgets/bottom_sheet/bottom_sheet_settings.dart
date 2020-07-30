@@ -22,6 +22,7 @@ class SettingsBottomSheet extends StatefulWidget {
 class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
   final prefs = sl<SharedPreferences>();
 
+  bool _vibration;
   bool _warning3Remaining;
   int _forwardDuration;
   int _rewindDuration;
@@ -29,6 +30,7 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
   @override
   void initState() {
     super.initState();
+    _vibration = prefs.getBool(PrefsKeys.vibration) ?? false;
     _warning3Remaining = prefs.getBool(PrefsKeys.warning3Remaining) ?? true;
     _forwardDuration = prefs.getInt(PrefsKeys.forwardDuration) ?? 5;
     _rewindDuration = prefs.getInt(PrefsKeys.rewindDuration) ?? 5;
@@ -39,6 +41,16 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
     return ListView(
       shrinkWrap: true,
       children: <Widget>[
+        SwitchListTile(
+          onChanged: (value) {
+            setState(() {
+              _vibration = value;
+            });
+            prefs.setBool(PrefsKeys.vibration, value);
+          },
+          value: _vibration,
+          title: Text('Vibration'),
+        ),
         SwitchListTile(
           onChanged: (value) {
             setState(() {

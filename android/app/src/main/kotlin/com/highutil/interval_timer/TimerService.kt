@@ -1,12 +1,11 @@
 package com.highutil.interval_timer
 
 import android.app.*
+import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.media.ToneGenerator
-import android.os.Binder
-import android.os.Build
-import android.os.IBinder
+import android.os.*
 import android.speech.tts.TextToSpeech
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LiveData
@@ -31,11 +30,13 @@ class TimerService : Service() {
     private lateinit var timer: MyTimer<Int>
     private lateinit var tts: TextToSpeech
     private lateinit var toneGenerator: ToneGenerator
+    private lateinit var vibrator: Vibrator
     private var index = 0
     private var repeatCount = 1
     private var isTtsInitialized = false
 
     private var warning3Remaining = true
+    private var vibration = false
 
     private val _remainingTime = MutableLiveData<Int>()
     val remainingTime: LiveData<Int>
@@ -55,6 +56,7 @@ class TimerService : Service() {
 
 
         toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -62,6 +64,7 @@ class TimerService : Service() {
         ttses = intent.getStringArrayExtra("ttses")!!.toList()
         repeatCount = intent.getIntExtra("repeatCount", 1)
         warning3Remaining = intent.getBooleanExtra("warning3Remaining", true)
+        vibration = intent.getBooleanExtra("vibration", false)
         remainingTimes = timesInMillisecond
         index = 0
         timer = object : MyTimer<Int>(1000L, { x -> remainingTimes[index] - x - 1 }) {
@@ -152,6 +155,9 @@ class TimerService : Service() {
                     2 -> tts.speak("2", TextToSpeech.QUEUE_FLUSH, null, "")
                     1 -> tts.speak("1", TextToSpeech.QUEUE_FLUSH, null, "")
                 }
+                if ((data >= 1) and (data <= 3)) {
+                    vibrate()
+                }
             }
             notificationManager.notify(NOTIFICATION_ID, createNotification(data))
             _remainingTime.postValue(data)
@@ -173,6 +179,7 @@ class TimerService : Service() {
                         tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
                     }
                 }
+                vibrate()
 
                 notificationManager.notify(NOTIFICATION_ID, createNotification(remainingTime))
                 _remainingTime.postValue(remainingTime)
@@ -197,6 +204,7 @@ class TimerService : Service() {
                                 tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
                             }
                         }
+                        vibrate()
 
                         notificationManager.notify(NOTIFICATION_ID, createNotification(remainingTime))
                         _remainingTime.postValue(remainingTime)
@@ -219,6 +227,7 @@ class TimerService : Service() {
                                 tts.speak(ttses[index], TextToSpeech.QUEUE_FLUSH, null, "")
                             }
                         }
+                        vibrate()
 
                         notificationManager.notify(NOTIFICATION_ID, createNotification(remainingTime))
                         _remainingTime.postValue(remainingTime)
@@ -227,10 +236,21 @@ class TimerService : Service() {
                         timer.cancel()
                         currentTts = ttses[index]
                         tts.speak("Done", TextToSpeech.QUEUE_FLUSH, null, "")
+                        vibrate()
                         notificationManager.notify(NOTIFICATION_ID, createNotification(finish = true))
                         _remainingTime.postValue(-1)
                     }
                 }
+            }
+        }
+    }
+
+    private fun vibrate() {
+        if (vibration and vibrator.hasVibrator()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(250, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                vibrator.vibrate(250)
             }
         }
     }
