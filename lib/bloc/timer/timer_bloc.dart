@@ -4,8 +4,11 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/foreground_service.dart';
+import '../../core/prefs_keys.dart';
+import '../../core/service_locator.dart';
 import '../../data/models/model_timer.dart';
 import '../../data/models/model_timer_piece.dart';
 import '../../data/repositories/repository_timer.dart';
@@ -17,6 +20,7 @@ part 'timer_state.dart';
 class TimerBloc extends Bloc<TimerEvent, TimerState> {
   final TimerRepository repository;
   final RepeatCountBloc repeatCountBloc;
+  final prefs = sl<SharedPreferences>();
 
   TimerModel _currentTimer;
 
@@ -191,12 +195,14 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   Stream<TimerState> _mapTimerForwardedToState(
     TimerForwarded event,
   ) async* {
-    ForegroundService.forward(5);
+    final duration = prefs.getInt(PrefsKeys.forwardDuration) ?? 5;
+    ForegroundService.forward(duration);
   }
 
   Stream<TimerState> _mapTimerRewoundToState(
     TimerRewound event,
   ) async* {
-    ForegroundService.rewind(5);
+    final duration = prefs.getInt(PrefsKeys.rewindDuration) ?? 5;
+    ForegroundService.rewind(duration);
   }
 }

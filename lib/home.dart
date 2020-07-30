@@ -9,6 +9,7 @@ import 'core/foreground_service.dart';
 import 'core/utils.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_presets.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_repeat_count.dart';
+import 'presentation/widgets/bottom_sheet/bottom_sheet_settings.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -99,7 +100,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             ),
             IconButton(
               icon: Icon(Icons.settings),
-              onPressed: () {},
+              onPressed: () {
+                SettingsBottomSheet.show(context);
+              },
             ),
           ],
         ),
