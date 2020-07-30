@@ -98,10 +98,21 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 }
               },
             ),
-            IconButton(
-              icon: Icon(Icons.settings),
-              onPressed: () {
-                SettingsBottomSheet.show(context);
+            BlocBuilder<TimerBloc, TimerState>(
+              builder: (context, state) {
+                if (state is TimerReady) {
+                  return IconButton(
+                    icon: Icon(Icons.settings),
+                    onPressed: () {
+                      SettingsBottomSheet.show(context);
+                    },
+                  );
+                } else {
+                  return IconButton(
+                    icon: Icon(Icons.settings),
+                    onPressed: null,
+                  );
+                }
               },
             ),
           ],

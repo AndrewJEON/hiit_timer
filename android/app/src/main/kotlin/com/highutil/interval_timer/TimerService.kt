@@ -52,7 +52,7 @@ class TimerService : Service() {
         startForeground(NOTIFICATION_ID, createNotification())
 
 
-        toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+        toneGenerator = ToneGenerator(AudioManager.STREAM_ALARM, 100)
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
