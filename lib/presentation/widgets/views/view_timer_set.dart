@@ -48,8 +48,8 @@ class TimerSetView extends StatelessWidget {
                 } else {
                   var count = 0;
                   for (var i = 0;
-                  i < previous.timerSets[index].timers.length;
-                  i++) {
+                      i < previous.timerSets[index].timers.length;
+                      i++) {
                     if (previous.timerSets[index].timers[i] !=
                         current.timerSets[index].timers[i]) {
                       count++;
@@ -68,6 +68,40 @@ class TimerSetView extends StatelessWidget {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          width: 128,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Expanded(
+                                child: Text('H', textAlign: TextAlign.center),
+                              ),
+                              Expanded(
+                                child: Text(':', textAlign: TextAlign.center),
+                              ),
+                              Expanded(
+                                child: Text('M', textAlign: TextAlign.center),
+                              ),
+                              Expanded(
+                                child: Text(':', textAlign: TextAlign.center),
+                              ),
+                              Expanded(
+                                child: Text('S', textAlign: TextAlign.center),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Flexible(
+                          child: Text('Text-To-Speech'),
+                        ),
+                      ],
+                    ),
+                  ),
                   for (var i = 0; i < state.timerSets[index].timers.length; i++)
                     Padding(
                       padding: const EdgeInsets.symmetric(
