@@ -237,7 +237,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           return Center(
             child: Text(
               formatDuration(state.remainingTime),
-              style: Theme.of(context).textTheme.headline1,
+              style: Theme.of(context).textTheme.headline1.copyWith(
+                    fontSize: 80,
+                  ),
+              maxLines: 1,
             ),
           );
         }
