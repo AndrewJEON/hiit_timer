@@ -15,6 +15,8 @@ import androidx.lifecycle.Observer
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import java.util.*
+import kotlin.collections.HashMap
 
 
 class MainActivity : FlutterActivity() {
@@ -68,6 +70,8 @@ class MainActivity : FlutterActivity() {
                         intent.putExtra("times", timesInMillisecond)
                         intent.putExtra("ttses", call.argument<List<String>>("ttses")?.toTypedArray())
                         intent.putExtra("repeatCount", call.argument<Int>("repeatCount"))
+                        val settings = call.argument<HashMap<String, Any>>("settings")
+                        intent.putExtra("warning3Remaining", settings?.get("warning3Remaining") as Boolean)
                         ContextCompat.startForegroundService(this, intent)
                         bindService(intent, connection, Context.BIND_AUTO_CREATE)
                     }

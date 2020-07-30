@@ -113,7 +113,10 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     final times = flattened.map((e) => e.duration.inSeconds).toList();
     final ttses = flattened.map((e) => e.description).toList();
     final repeatCount = repeatCountBloc.state;
-    ForegroundService.start(times, ttses, repeatCount);
+    final settings = <String, dynamic>{
+      'warning3Remaining': prefs.getBool(PrefsKeys.warning3Remaining) ?? true,
+    };
+    ForegroundService.start(times, ttses, repeatCount, settings);
     yield TimerRunning(
       remainingTime: _currentTimer.timerSets[0].timers[0].duration,
       name: state.name,

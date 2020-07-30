@@ -35,6 +35,8 @@ class TimerService : Service() {
     private var repeatCount = 1
     private var isTtsInitialized = false
 
+    private var warning3Remaining = true
+
     private val _remainingTime = MutableLiveData<Int>()
     val remainingTime: LiveData<Int>
         get() = _remainingTime
@@ -59,6 +61,7 @@ class TimerService : Service() {
         val timesInMillisecond = intent.getIntArrayExtra("times")!!.toList()
         ttses = intent.getStringArrayExtra("ttses")!!.toList()
         repeatCount = intent.getIntExtra("repeatCount", 1)
+        warning3Remaining = intent.getBooleanExtra("warning3Remaining", true)
         remainingTimes = timesInMillisecond
         index = 0
         timer = object : MyTimer<Int>(1000L, { x -> remainingTimes[index] - x - 1 }) {
@@ -143,7 +146,7 @@ class TimerService : Service() {
 
     private fun tick(data: Int) {
         if (data > 0) {
-            if (isTtsInitialized) {
+            if (warning3Remaining and isTtsInitialized) {
                 when (data) {
                     3 -> tts.speak("3", TextToSpeech.QUEUE_FLUSH, null, "")
                     2 -> tts.speak("2", TextToSpeech.QUEUE_FLUSH, null, "")

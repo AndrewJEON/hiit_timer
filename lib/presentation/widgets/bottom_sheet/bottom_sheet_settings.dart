@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:interval_timer/core/prefs_keys.dart';
-import 'package:interval_timer/core/service_locator.dart';
-import 'package:interval_timer/presentation/widgets/dialogs/dialog_duration.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../core/prefs_keys.dart';
+import '../../../core/service_locator.dart';
+import '../dialogs/dialog_duration.dart';
 
 class SettingsBottomSheet extends StatefulWidget {
   static Future<int> show(BuildContext context) async {
@@ -21,14 +22,16 @@ class SettingsBottomSheet extends StatefulWidget {
 class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
   final prefs = sl<SharedPreferences>();
 
-  int forwardDuration;
-  int rewindDuration;
+  bool _warning3Remaining;
+  int _forwardDuration;
+  int _rewindDuration;
 
   @override
   void initState() {
     super.initState();
-    forwardDuration = prefs.getInt(PrefsKeys.forwardDuration) ?? 5;
-    rewindDuration = prefs.getInt(PrefsKeys.rewindDuration) ?? 5;
+    _warning3Remaining = prefs.getBool(PrefsKeys.warning3Remaining) ?? true;
+    _forwardDuration = prefs.getInt(PrefsKeys.forwardDuration) ?? 5;
+    _rewindDuration = prefs.getInt(PrefsKeys.rewindDuration) ?? 5;
   }
 
   @override
@@ -36,15 +39,25 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
     return ListView(
       shrinkWrap: true,
       children: <Widget>[
+        SwitchListTile(
+          onChanged: (value) {
+            setState(() {
+              _warning3Remaining = value;
+            });
+            prefs.setBool(PrefsKeys.warning3Remaining, value);
+          },
+          value: _warning3Remaining,
+          title: Text('Warning With 3 Seconds Remaining'),
+        ),
         ListTile(
           title: Text('Forward Duration'),
-          subtitle: Text('$forwardDuration sec'),
+          subtitle: Text('$_forwardDuration sec'),
           onTap: () async {
             final duration =
-                await DurationDialog.show(context, duration: forwardDuration);
+                await DurationDialog.show(context, duration: _forwardDuration);
             if (duration != null) {
               setState(() {
-                forwardDuration = duration;
+                _forwardDuration = duration;
               });
               prefs.setInt(PrefsKeys.forwardDuration, duration);
             }
@@ -52,13 +65,13 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
         ),
         ListTile(
           title: Text('Rewind Duration'),
-          subtitle: Text('$rewindDuration sec'),
+          subtitle: Text('$_rewindDuration sec'),
           onTap: () async {
             final duration =
-                await DurationDialog.show(context, duration: rewindDuration);
+                await DurationDialog.show(context, duration: _rewindDuration);
             if (duration != null) {
               setState(() {
-                rewindDuration = duration;
+                _rewindDuration = duration;
               });
               prefs.setInt(PrefsKeys.rewindDuration, duration);
             }

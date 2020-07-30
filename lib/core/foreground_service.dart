@@ -11,12 +11,14 @@ class ForegroundService {
     List<int> timesInSecond,
     List<String> ttses,
     int repeatCount,
+    Map<String, dynamic> settings,
   ) async {
     try {
       await platform.invokeMethod('start', <String, dynamic>{
         'times': timesInSecond,
         'ttses': ttses,
         'repeatCount': repeatCount,
+        'settings': settings,
       });
     } on PlatformException catch (e) {
       debugPrint('ForegroundService start error: $e');
