@@ -181,7 +181,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Widget timerName() {
     return BlocBuilder<TimerBloc, TimerState>(
       builder: (context, state) {
-        if (state is TimerInitial) {
+        if (state is TimerInitial || state.name == null) {
           return Container();
         } else {
           return Text(
@@ -199,7 +199,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Widget tts() {
     return BlocBuilder<TimerBloc, TimerState>(
       builder: (context, state) {
-        if (state is TimerInitial) {
+        if (state is TimerInitial || state.tts == null) {
           return Container();
         } else {
           return Text(

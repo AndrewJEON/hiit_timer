@@ -151,12 +151,14 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   Stream<TimerState> _mapTimerResetToState(
     TimerReset event,
   ) async* {
-    ForegroundService.stop();
-    yield TimerReady(
-      remainingTime: _currentTimer.timerSets[0].timers[0].duration,
-      name: _currentTimer.name,
-      tts: _currentTimer.timerSets[0].timers[0].description,
-    );
+    if (state is TimerRunning || state is TimerPause || state is TimerFinish) {
+      ForegroundService.stop();
+      yield TimerReady(
+        remainingTime: _currentTimer.timerSets[0].timers[0].duration,
+        name: _currentTimer.name,
+        tts: _currentTimer.timerSets[0].timers[0].description,
+      );
+    }
   }
 
   Stream<TimerState> _mapTimerTickedToState(
@@ -189,6 +191,10 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   ) async* {
     ForegroundService.stop();
     _currentTimer = event.timer;
+    if (_currentTimer == null) {
+      yield TimerFailure.noSavedTimer();
+      return;
+    }
     yield TimerReady(
       remainingTime: _currentTimer.timerSets[0].timers[0].duration,
       name: _currentTimer.name,

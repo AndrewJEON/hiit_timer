@@ -9,6 +9,7 @@ import '../../data/repositories/repository_timer.dart';
 import '../timer/timer_bloc.dart';
 
 part 'preset_event.dart';
+
 part 'preset_state.dart';
 
 class PresetBloc extends Bloc<PresetEvent, PresetState> {
@@ -76,6 +77,15 @@ class PresetBloc extends Bloc<PresetEvent, PresetState> {
       ..removeWhere((timer) => timer.name == event.timer.name);
     yield PresetSuccess(newTimers);
     await repository.delete(event.timer);
+    if (timerBloc.currentTimer.name == event.timer.name) {
+      final timers = (await repository.load())
+        ..sort((a, b) => a.name.compareTo(b.name));
+      if (timers.isNotEmpty) {
+        timerBloc.add(TimerSelected(timers[0]));
+      } else {
+        timerBloc.add(TimerSelected(null));
+      }
+    }
   }
 
   Stream<PresetState> _mapPresetRenamedToState(
@@ -111,5 +121,8 @@ class PresetBloc extends Bloc<PresetEvent, PresetState> {
     final newTimers = List.of(state.timers)..add(event.timer);
     yield PresetSuccess(newTimers);
     await repository.save(event.timer);
+    if (timerBloc.currentTimer == null) {
+      timerBloc.add(TimerSelected(event.timer));
+    }
   }
 }

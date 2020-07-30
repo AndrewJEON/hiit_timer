@@ -17,8 +17,6 @@ class TimerService : Service() {
     companion object {
         const val CHANNEL_ID = "CHANNEL_ID"
         const val NOTIFICATION_ID = 1
-        const val STATE_RUNNING = "STATE_RUNNING"
-        const val STATE_PAUSE = "STATE_PAUSE"
     }
 
     private val binder = TimerBinder()
