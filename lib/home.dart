@@ -2,14 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'bloc/repeat_count/repeat_count_bloc.dart';
 import 'bloc/timer/timer_bloc.dart';
 import 'core/foreground_service.dart';
+import 'core/prefs_keys.dart';
+import 'core/service_locator.dart';
 import 'core/utils.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_presets.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_repeat_count.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_settings.dart';
+import 'presentation/widgets/dialogs/dialog_review_prompt.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -22,6 +26,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    final prefs = sl<SharedPreferences>();
+    final launchCount = prefs.getInt(PrefsKeys.launchCount) ?? 0;
+    prefs.setInt(PrefsKeys.launchCount, launchCount + 1);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (prefs.getInt(PrefsKeys.launchCount) == 3) {
+        ReviewPromptDialog.show(context);
+      }
+    });
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),

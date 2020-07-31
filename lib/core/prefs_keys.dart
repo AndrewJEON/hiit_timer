@@ -1,4 +1,5 @@
 class PrefsKeys {
+  static const launchCount = 'launch_count';
   static const firstOpen = 'first_open';
   static const vibration = 'vibration';
   static const warning3Remaining = 'warning_3_remaining';
