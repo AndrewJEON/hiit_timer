@@ -153,9 +153,9 @@ class TimerService : Service() {
                     2 -> tts.speak("2", TextToSpeech.QUEUE_FLUSH, null, "")
                     1 -> tts.speak("1", TextToSpeech.QUEUE_FLUSH, null, "")
                 }
-                if ((data >= 1) and (data <= 3)) {
-                    vibrate()
-                }
+            }
+            if ((data >= 1) and (data <= 3)) {
+                vibrate()
             }
             notificationManager.notify(NOTIFICATION_ID, createNotification(data))
             _remainingTime.postValue(data)
