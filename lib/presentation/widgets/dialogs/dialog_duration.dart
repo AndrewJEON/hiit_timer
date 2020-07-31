@@ -56,6 +56,7 @@ class _DurationDialogState extends State<DurationDialog> {
         FlatButton(
           onPressed: () => Navigator.pop(context, null),
           child: Text('Cancel'),
+          textColor: Colors.black,
         ),
         FlatButton(
           onPressed: () {
@@ -63,6 +64,8 @@ class _DurationDialogState extends State<DurationDialog> {
             Navigator.pop(context, duration);
           },
           child: Text('Save'),
+          color: Theme.of(context).primaryColor,
+          textColor: Colors.white,
         ),
       ],
     );

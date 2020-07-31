@@ -20,6 +20,10 @@ class _TimerCreatingPageState extends State<TimerCreatingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Text(widget.timer == null ? 'Creating' : 'Editing'),
         actions: <Widget>[
           IconButton(
@@ -80,14 +84,17 @@ class _TimerCreatingPageState extends State<TimerCreatingPage> {
                 },
               ),
             ),
-            SizedBox(
+            Container(
               width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 32),
               child: FlatButton.icon(
                 icon: Icon(Icons.add),
                 label: Text('Add New Set'),
                 onPressed: () {
                   context.bloc<TimerCreatingBloc>().add(TimerSetAdded());
                 },
+                color: Theme.of(context).primaryColor,
+                textColor: Colors.white,
               ),
             ),
           ],

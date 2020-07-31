@@ -31,14 +31,18 @@ class TimerSetView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              repeatCount(context),
-              options(context),
-            ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                repeatCount(context),
+                options(context),
+              ],
+            ),
           ),
-          Divider(),
+          Divider(height: 0),
+          SizedBox(height: 16),
           BlocBuilder<TimerCreatingBloc, TimerModel>(
             buildWhen: (previous, current) {
               try {
@@ -68,90 +72,12 @@ class TimerSetView extends StatelessWidget {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: Row(
-                      children: <Widget>[
-                        Container(
-                          width: 128,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Expanded(
-                                child: Text(
-                                  'H',
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      .copyWith(fontWeight: FontWeight.w900),
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  ':',
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      .copyWith(fontWeight: FontWeight.w900),
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  'M',
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      .copyWith(fontWeight: FontWeight.w900),
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  ':',
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      .copyWith(fontWeight: FontWeight.w900),
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  'S',
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      .copyWith(fontWeight: FontWeight.w900),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Flexible(
-                          child: Text(
-                            'Text-To-Speech',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText1
-                                .copyWith(fontWeight: FontWeight.w900),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Divider(),
-                  ),
                   for (var i = 0; i < state.timerSets[index].timers.length; i++)
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 2),
+                        horizontal: 16,
+                        vertical: 2,
+                      ),
                       child: TimerView(
                         key: UniqueKey(),
                         timer: state.timerSets[index].timers[i],
@@ -163,14 +89,18 @@ class TimerSetView extends StatelessWidget {
               );
             },
           ),
-          SizedBox(
+          SizedBox(height: 8),
+          Container(
             width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: FlatButton.icon(
               onPressed: () {
                 context.bloc<TimerCreatingBloc>().add(TimerAdded(index));
               },
               icon: Icon(Icons.add),
               label: Text('Add'),
+              color: Theme.of(context).primaryColor,
+              textColor: Colors.white,
             ),
           ),
         ],
@@ -213,7 +143,13 @@ class TimerSetView extends StatelessWidget {
             }
           },
           builder: (context, state) {
-            return Text('${state.timerSets[index].repeatCount}x');
+            return Text(
+              '${state.timerSets[index].repeatCount}x',
+              style: Theme.of(context).textTheme.bodyText1.copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+            );
           },
         ),
         Container(

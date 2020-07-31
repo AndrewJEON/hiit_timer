@@ -67,6 +67,7 @@ class _TimerNameDialogState extends State<TimerNameDialog> {
         FlatButton(
           child: Text('Cancel'),
           onPressed: () => Navigator.pop(context, null),
+          textColor: Colors.black,
         ),
         FlatButton(
           child: Text(widget.currentName == null ? 'Save' : 'Rename'),
@@ -82,6 +83,8 @@ class _TimerNameDialogState extends State<TimerNameDialog> {
                   }
                 }
               : null,
+          color: Theme.of(context).primaryColor,
+          textColor: Colors.white,
         ),
       ],
     );

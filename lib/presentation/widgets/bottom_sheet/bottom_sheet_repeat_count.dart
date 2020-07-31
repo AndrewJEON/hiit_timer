@@ -36,34 +36,38 @@ class _RepeatCountBottomSheetState extends State<RepeatCountBottomSheet> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Navigator.pop(context, null);
-              },
-              child: Text('Cancel'),
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                IconButton(
-                  onPressed: () {
-                    Navigator.pop(context, -1);
-                  },
-                  icon: Icon(Ionicons.ios_infinite),
-                ),
-                FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context, _repeatCount);
-                  },
-                  child: Text('Done'),
-                  textColor: Theme.of(context).primaryColor,
-                ),
-              ],
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context, null);
+                },
+                child: Text('Cancel'),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context, -1);
+                    },
+                    icon: Icon(Ionicons.ios_infinite),
+                  ),
+                  FlatButton(
+                    onPressed: () {
+                      Navigator.pop(context, _repeatCount);
+                    },
+                    child: Text('Done'),
+                    color: Theme.of(context).primaryColor,
+                    textColor: Colors.white,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),

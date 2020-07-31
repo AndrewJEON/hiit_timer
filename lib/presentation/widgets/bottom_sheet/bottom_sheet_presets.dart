@@ -24,17 +24,20 @@ class PresetsBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Navigator.pop(context, null);
-              },
-              child: Text('Cancel'),
-            ),
-            createNewTimerButton(context),
-          ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context, null);
+                },
+                child: Text('Cancel'),
+              ),
+              createNewTimerButton(context),
+            ],
+          ),
         ),
         Expanded(
           child: BlocBuilder<PresetBloc, PresetState>(
@@ -97,7 +100,8 @@ class PresetsBottomSheet extends StatelessWidget {
       },
       icon: Icon(Icons.add),
       label: Text('New Timer'),
-      textColor: Theme.of(context).primaryColor,
+      color: Theme.of(context).primaryColor,
+      textColor: Colors.white,
     );
   }
 

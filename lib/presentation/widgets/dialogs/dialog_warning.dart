@@ -12,10 +12,13 @@ class DeleteDialog extends StatelessWidget {
         FlatButton(
           onPressed: () => Navigator.pop(context, false),
           child: Text('Cancel'),
+          textColor: Colors.black,
         ),
         FlatButton(
           onPressed: () => Navigator.pop(context, true),
           child: Text('Delete'),
+          color: Theme.of(context).primaryColor,
+          textColor: Colors.white,
         ),
       ],
     );

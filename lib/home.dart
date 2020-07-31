@@ -146,9 +146,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         '${state}x',
                         style: Theme.of(context).textTheme.bodyText1,
                       ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
               );
             },
           );
@@ -225,9 +222,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       },
       icon: Icon(Icons.refresh),
       label: Text('Reset'),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
     );
   }
 

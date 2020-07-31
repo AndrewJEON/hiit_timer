@@ -158,17 +158,17 @@ class _TimerViewState extends State<TimerView> {
         children: <Widget>[
           duration(),
           Flexible(
-              child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: description(),
-          )),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: description(),
+            ),
+          ),
           options(),
         ],
       ),
       decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(8),
-      ),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Theme.of(context).primaryColor)),
     );
   }
 
@@ -178,6 +178,9 @@ class _TimerViewState extends State<TimerView> {
       focusNode: _ttsFocusNode,
       maxLines: null,
       textInputAction: TextInputAction.done,
+      decoration: InputDecoration(
+        hintText: 'Text-To-Speech',
+      ),
       onChanged: (value) {
         context.bloc<TimerCreatingBloc>().add(
               TimerDescriptionChanged(
@@ -194,6 +197,10 @@ class _TimerViewState extends State<TimerView> {
     return Container(
       width: 128,
       padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor,
+        borderRadius: BorderRadius.horizontal(left: Radius.circular(8)),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -209,6 +216,7 @@ class _TimerViewState extends State<TimerView> {
               ],
               textAlign: TextAlign.end,
               cursorWidth: 0,
+              style: TextStyle(color: Colors.white),
               onSubmitted: (value) => FocusScope.of(context).nextFocus(),
               onChanged: (value) {
                 if (value.length == 2) {
@@ -217,7 +225,13 @@ class _TimerViewState extends State<TimerView> {
               },
             ),
           ),
-          Expanded(child: Text(':', textAlign: TextAlign.center)),
+          Expanded(
+            child: Text(
+              ':',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
           Expanded(
             child: TextField(
               controller: _minuteController,
@@ -230,6 +244,7 @@ class _TimerViewState extends State<TimerView> {
               ],
               textAlign: TextAlign.end,
               cursorWidth: 0,
+              style: TextStyle(color: Colors.white),
               onSubmitted: (value) => FocusScope.of(context).nextFocus(),
               onChanged: (value) {
                 if (value.length == 2) {
@@ -238,7 +253,13 @@ class _TimerViewState extends State<TimerView> {
               },
             ),
           ),
-          Expanded(child: Text(':', textAlign: TextAlign.center)),
+          Expanded(
+            child: Text(
+              ':',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
           Expanded(
             child: TextField(
               controller: _secondController,
@@ -251,6 +272,7 @@ class _TimerViewState extends State<TimerView> {
               ],
               textAlign: TextAlign.end,
               cursorWidth: 0,
+              style: TextStyle(color: Colors.white),
               onSubmitted: (value) => FocusScope.of(context).nextFocus(),
               onChanged: (value) {
                 if (value.length == 2) {
