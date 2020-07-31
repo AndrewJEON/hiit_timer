@@ -86,15 +86,16 @@ class _TimerCreatingPageState extends State<TimerCreatingPage> {
             ),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 32),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               child: FlatButton.icon(
-                icon: Icon(Icons.add),
+                icon: Icon(
+                  Icons.add_circle,
+                  color: Theme.of(context).primaryColor,
+                ),
                 label: Text('Add New Set'),
                 onPressed: () {
                   context.bloc<TimerCreatingBloc>().add(TimerSetAdded());
                 },
-                color: Theme.of(context).primaryColor,
-                textColor: Colors.white,
               ),
             ),
           ],

@@ -92,15 +92,13 @@ class TimerSetView extends StatelessWidget {
           SizedBox(height: 8),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 4),
             child: FlatButton.icon(
               onPressed: () {
                 context.bloc<TimerCreatingBloc>().add(TimerAdded(index));
               },
-              icon: Icon(Icons.add),
+              icon: Icon(Icons.add_circle, color: Theme.of(context).primaryColor),
               label: Text('Add'),
-              color: Theme.of(context).primaryColor,
-              textColor: Colors.white,
             ),
           ),
         ],
