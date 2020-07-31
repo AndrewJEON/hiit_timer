@@ -244,6 +244,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               formatDuration(state.remainingTime),
               style: Theme.of(context).textTheme.headline1.copyWith(
                     fontSize: 80,
+                    fontWeight: FontWeight.bold,
                   ),
               maxLines: 1,
             ),
