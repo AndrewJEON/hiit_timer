@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../bloc/timer_creating/timer_creating_bloc.dart';
 import '../../data/models/model_timer.dart';
@@ -29,17 +30,24 @@ class _TimerCreatingPageState extends State<TimerCreatingPage> {
           IconButton(
             icon: Icon(Icons.check),
             onPressed: () async {
+              final currentState = context.bloc<TimerCreatingBloc>().state;
+              if (currentState.timerSets.isEmpty ||
+                  currentState.timerSets[0].timers.isEmpty) {
+                Fluttertoast.showToast(
+                  msg: 'You must have at least one timer',
+                  backgroundColor: Colors.grey[600],
+                );
+                return;
+              }
               if (widget.timer == null) {
                 final name = await TimerNameDialog.show(context);
                 if (name != null) {
-                  final timerSets =
-                      context.bloc<TimerCreatingBloc>().state.timerSets;
+                  final timerSets = currentState.timerSets;
                   final timer = TimerModel(name: name, timerSets: timerSets);
                   Navigator.pop(context, timer);
                 }
               } else {
-                final timer = context.bloc<TimerCreatingBloc>().state;
-                Navigator.pop(context, timer);
+                Navigator.pop(context, currentState);
               }
             },
           ),
