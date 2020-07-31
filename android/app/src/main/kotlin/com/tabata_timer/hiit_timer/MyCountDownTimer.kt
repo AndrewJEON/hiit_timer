@@ -1,4 +1,4 @@
-package com.highutil.interval_timer
+package com.tabata_timer.hiit_timer
 
 import java.util.*
 

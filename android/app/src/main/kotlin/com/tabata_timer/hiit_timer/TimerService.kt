@@ -1,4 +1,4 @@
-package com.highutil.interval_timer
+package com.tabata_timer.hiit_timer
 
 import android.app.*
 import android.content.Context

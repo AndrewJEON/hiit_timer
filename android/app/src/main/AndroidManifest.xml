@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.highutil.interval_timer">
+    package="com.tabata_timer.hiit_timer">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
@@ -9,7 +9,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:icon="@mipmap/ic_launcher"
-        android:label="interval_timer">
+        android:label="HIIT Timer">
         <service
             android:name=".TimerService"
             android:exported="false" />

@@ -1,4 +1,4 @@
-package com.highutil.interval_timer
+package com.tabata_timer.hiit_timer
 
 import android.app.ActivityManager
 import android.content.ComponentName
@@ -7,15 +7,12 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.os.PersistableBundle
-import android.util.Log
 import androidx.annotation.NonNull
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
-import java.util.*
 import kotlin.collections.HashMap
 
 
