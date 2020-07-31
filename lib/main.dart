@@ -51,11 +51,19 @@ class MyApp extends StatelessWidget {
 
   ThemeData theme(BuildContext context) {
     return ThemeData(
-      primaryColor: Colors.amber[800],
-      accentColor: Colors.amber[800],
+      primaryColor: Colors.deepOrange[400],
+      accentColor: Colors.deepOrange[400],
       appBarTheme: AppBarTheme(
         color: Colors.transparent,
-        elevation: 0
+        elevation: 0,
+        iconTheme: IconThemeData(
+          color: Colors.black,
+        ),
+        textTheme: Theme.of(context).textTheme.copyWith(
+          headline6: Theme.of(context).textTheme.headline6.copyWith(
+            color: Colors.black,
+          ),
+        ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         shape: RoundedRectangleBorder(
@@ -63,10 +71,9 @@ class MyApp extends StatelessWidget {
         ),
       ),
       buttonTheme: ButtonThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        )
-      ),
+          shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      )),
       cardTheme: CardTheme(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
