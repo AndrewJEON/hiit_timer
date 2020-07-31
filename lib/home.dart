@@ -232,7 +232,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           return Center(child: CircularProgressIndicator());
         } else if (state is TimerFinish) {
           return Center(
-            child: Text('Done!'),
+            child: Text(
+              'Done!',
+              style: Theme.of(context).textTheme.headline1.copyWith(
+                    fontSize: 80,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
           );
         } else if (state is TimerFailure) {
           return Center(
