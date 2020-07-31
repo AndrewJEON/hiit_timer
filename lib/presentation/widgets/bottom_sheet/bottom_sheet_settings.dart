@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/prefs_keys.dart';
 import '../../../core/service_locator.dart';
@@ -38,56 +40,86 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      shrinkWrap: true,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        SwitchListTile(
-          onChanged: (value) {
-            setState(() {
-              _vibration = value;
-            });
-            prefs.setBool(PrefsKeys.vibration, value);
-          },
-          value: _vibration,
-          title: Text('Vibration'),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              FlatButton.icon(
+                onPressed: () async {
+                  final params = Uri(
+                    scheme: 'mailto',
+                    path: 'support@highutil.com',
+                  );
+                  if (await canLaunch(params.toString())) {
+                    launch(params.toString());
+                  } else {
+                    Fluttertoast.showToast(msg: 'Cannot send email');
+                  }
+                },
+                icon: Icon(Icons.email, color: Theme.of(context).primaryColor),
+                label: Text('Feedback'),
+              ),
+            ],
+          ),
         ),
-        SwitchListTile(
-          onChanged: (value) {
-            setState(() {
-              _warning3Remaining = value;
-            });
-            prefs.setBool(PrefsKeys.warning3Remaining, value);
-          },
-          value: _warning3Remaining,
-          title: Text('Warning With 3 Seconds Remaining'),
-        ),
-        ListTile(
-          title: Text('Forward Duration'),
-          subtitle: Text('$_forwardDuration sec'),
-          onTap: () async {
-            final duration =
-                await DurationDialog.show(context, duration: _forwardDuration);
-            if (duration != null) {
-              setState(() {
-                _forwardDuration = duration;
-              });
-              prefs.setInt(PrefsKeys.forwardDuration, duration);
-            }
-          },
-        ),
-        ListTile(
-          title: Text('Rewind Duration'),
-          subtitle: Text('$_rewindDuration sec'),
-          onTap: () async {
-            final duration =
-                await DurationDialog.show(context, duration: _rewindDuration);
-            if (duration != null) {
-              setState(() {
-                _rewindDuration = duration;
-              });
-              prefs.setInt(PrefsKeys.rewindDuration, duration);
-            }
-          },
+        Flexible(
+          child: ListView(
+            shrinkWrap: true,
+            children: <Widget>[
+              SwitchListTile(
+                onChanged: (value) {
+                  setState(() {
+                    _vibration = value;
+                  });
+                  prefs.setBool(PrefsKeys.vibration, value);
+                },
+                value: _vibration,
+                title: Text('Vibration'),
+              ),
+              SwitchListTile(
+                onChanged: (value) {
+                  setState(() {
+                    _warning3Remaining = value;
+                  });
+                  prefs.setBool(PrefsKeys.warning3Remaining, value);
+                },
+                value: _warning3Remaining,
+                title: Text('Warning With 3 Seconds Remaining'),
+              ),
+              ListTile(
+                title: Text('Forward Duration'),
+                subtitle: Text('$_forwardDuration sec'),
+                onTap: () async {
+                  final duration = await DurationDialog.show(context,
+                      duration: _forwardDuration);
+                  if (duration != null) {
+                    setState(() {
+                      _forwardDuration = duration;
+                    });
+                    prefs.setInt(PrefsKeys.forwardDuration, duration);
+                  }
+                },
+              ),
+              ListTile(
+                title: Text('Rewind Duration'),
+                subtitle: Text('$_rewindDuration sec'),
+                onTap: () async {
+                  final duration = await DurationDialog.show(context,
+                      duration: _rewindDuration);
+                  if (duration != null) {
+                    setState(() {
+                      _rewindDuration = duration;
+                    });
+                    prefs.setInt(PrefsKeys.rewindDuration, duration);
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ],
     );
