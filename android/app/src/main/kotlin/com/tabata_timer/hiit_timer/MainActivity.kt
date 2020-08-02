@@ -18,7 +18,7 @@ import kotlin.collections.HashMap
 
 class MainActivity : FlutterActivity() {
     companion object {
-        const val CHANNEL = "com.highutil.interval_timer/timer"
+        const val CHANNEL = "com.tabata_timer.hiit_timer/timer"
     }
 
     private lateinit var service: TimerService

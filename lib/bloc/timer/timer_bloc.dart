@@ -22,7 +22,7 @@ part 'timer_state.dart';
 
 class TimerBloc extends Bloc<TimerEvent, TimerState> {
   static const platform =
-      const MethodChannel('com.highutil.interval_timer/timer');
+      const MethodChannel('com.tabata_timer.hiit_timer/timer');
 
   final TimerRepository repository;
   final CurrentTimerBloc currentTimerBloc;
