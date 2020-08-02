@@ -2,6 +2,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'bloc/current_timer/current_timer_bloc.dart';
 import 'bloc/preset/preset_bloc.dart';
 import 'bloc/repeat_count/repeat_count_bloc.dart';
 import 'bloc/timer/timer_bloc.dart';
@@ -14,25 +15,23 @@ void main() async {
   Crashlytics.instance.enableInDevMode = true;
   FlutterError.onError = Crashlytics.instance.recordFlutterError;
   await initServiceLocator();
+  final currentTimerBloc = CurrentTimerBloc(repository: sl<TimerRepository>());
   final repeatCountBloc = RepeatCountBloc();
   final timerBloc = TimerBloc(
     repository: sl<TimerRepository>(),
+    currentTimerBloc: currentTimerBloc,
     repeatCountBloc: repeatCountBloc,
   );
   runApp(MultiBlocProvider(
     providers: [
+      BlocProvider(create: (context) => currentTimerBloc),
+      BlocProvider(create: (context) => repeatCountBloc),
+      BlocProvider(create: (context) => timerBloc),
       BlocProvider(
-        create: (context) => repeatCountBloc,
-      ),
-      BlocProvider(
-        create: (context) => timerBloc,
-      ),
-      BlocProvider(
-        create: (context) => PresetBloc(
-          repository: sl<TimerRepository>(),
-          timerBloc: timerBloc,
-        ),
-      ),
+          create: (context) => PresetBloc(
+                repository: sl<TimerRepository>(),
+                currentTimerBloc: currentTimerBloc,
+              )),
     ],
     child: MyApp(),
   ));
@@ -60,10 +59,10 @@ class MyApp extends StatelessWidget {
           color: Colors.black,
         ),
         textTheme: Theme.of(context).textTheme.copyWith(
-          headline6: Theme.of(context).textTheme.headline6.copyWith(
-            color: Colors.black,
-          ),
-        ),
+              headline6: Theme.of(context).textTheme.headline6.copyWith(
+                    color: Colors.black,
+                  ),
+            ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         shape: RoundedRectangleBorder(

@@ -4,13 +4,12 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/prefs_keys.dart';
 import '../../core/service_locator.dart';
 import '../models/model_timer.dart';
 
 class TimerRepository {
   static const timerExtension = '.timer';
-  static const latestTimerKey = 'latest_timer';
-  static const repeatCountKey = 'repeat_count';
 
   final prefs = sl<SharedPreferences>();
   final timerDir = sl<Directory>();
@@ -52,7 +51,15 @@ class TimerRepository {
   }
 
   Future<TimerModel> loadLatestTimer() async {
-    final name = prefs.getString(latestTimerKey);
+    if (prefs.getBool(PrefsKeys.firstOpen) ?? true) {
+      final example = TimerModel.example();
+      await save(example);
+      await saveLatestTimer(example);
+      prefs.setBool(PrefsKeys.firstOpen, false);
+      return TimerModel.example();
+    }
+
+    final name = prefs.getString(PrefsKeys.latestTimerKey);
     final files =
         timerDir.list().where((entity) => entity is File).cast<File>();
     await for (final file in files) {
@@ -66,7 +73,7 @@ class TimerRepository {
   }
 
   Future<void> saveLatestTimer(TimerModel timer) async {
-    prefs.setString(latestTimerKey, timer.name);
+    prefs.setString(PrefsKeys.latestTimerKey, timer.name);
   }
 
   Future<bool> isDuplicate(String name) async {

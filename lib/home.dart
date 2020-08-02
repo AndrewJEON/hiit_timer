@@ -1,15 +1,15 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'bloc/current_timer/current_timer_bloc.dart';
 import 'bloc/repeat_count/repeat_count_bloc.dart';
 import 'bloc/timer/timer_bloc.dart';
-import 'core/foreground_service.dart';
 import 'core/prefs_keys.dart';
 import 'core/service_locator.dart';
 import 'core/utils.dart';
+import 'data/models/model_timer.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_presets.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_repeat_count.dart';
 import 'presentation/widgets/bottom_sheet/bottom_sheet_settings.dart';
@@ -57,9 +57,15 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  repeatCount(),
+                  SizedBox(
+                    width: 100,
+                    child: repeatCount(),
+                  ),
                   Flexible(child: timerName()),
-                  resetButton(),
+                  SizedBox(
+                    width: 100 ,
+                    child: resetButton(),
+                  ),
                 ],
               ),
             ),
@@ -101,15 +107,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.list),
-              onPressed: () async {
-                final timer = await PresetsBottomSheet.show(context);
-                if (timer != null) {
-                  context.bloc<TimerBloc>().add(TimerSelected(timer));
-                }
-              },
-            ),
+            presetButton(),
             BlocBuilder<TimerBloc, TimerState>(
               builder: (context, state) {
                 if (state is TimerReady) {
@@ -188,11 +186,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   }
 
   Widget timerName() {
-    return BlocBuilder<TimerBloc, TimerState>(
+    return BlocBuilder<CurrentTimerBloc, TimerModel>(
       builder: (context, state) {
-        if (state is TimerInitial || state.name == null) {
-          return Container();
-        } else {
+        if (state != null) {
           return Text(
             state.name,
             style: Theme.of(context).textTheme.headline6,
@@ -200,6 +196,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           );
+        } else {
+          return Container();
         }
       },
     );
@@ -208,7 +206,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Widget tts() {
     return BlocBuilder<TimerBloc, TimerState>(
       builder: (context, state) {
-        if (state is TimerInitial || state.tts == null) {
+        if (state is TimerLoadInProgress || state.tts == null) {
           return Container();
         } else {
           return Text(
@@ -227,20 +225,33 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   }
 
   Widget resetButton() {
-    return FlatButton.icon(
-      onPressed: () {
-        ForegroundService.stop();
-        context.bloc<TimerBloc>().add(TimerReset());
+    return BlocBuilder<TimerBloc, TimerState>(
+      builder: (context, state) {
+        if (state is TimerLoadInProgress ||
+            state is TimerReady ||
+            state is TimerFailure) {
+          return FlatButton.icon(
+            onPressed: null,
+            icon: Icon(Icons.refresh),
+            label: Text('Reset'),
+          );
+        } else {
+          return FlatButton.icon(
+            onPressed: () {
+              context.bloc<TimerBloc>().add(TimerReset());
+            },
+            icon: Icon(Icons.refresh),
+            label: Text('Reset'),
+          );
+        }
       },
-      icon: Icon(Icons.refresh),
-      label: Text('Reset'),
     );
   }
 
   Widget remainingTime() {
     return BlocBuilder<TimerBloc, TimerState>(
       builder: (context, state) {
-        if (state is TimerInitial) {
+        if (state is TimerLoadInProgress) {
           return Center(child: CircularProgressIndicator());
         } else if (state is TimerFinish) {
           return Center(
@@ -253,9 +264,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             ),
           );
         } else if (state is TimerFailure) {
-          return Center(
-            child: Text(state.message),
-          );
+          return Center(child: Text(state.message));
         } else {
           return Center(
             child: Text(
@@ -272,20 +281,37 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
+  Widget presetButton() {
+    return BlocBuilder<TimerBloc, TimerState>(
+      builder: (context, state) {
+        if (state is TimerReady || state is TimerFailure) {
+          return IconButton(
+            icon: Icon(Icons.list),
+            onPressed: () async {
+              final timer = await PresetsBottomSheet.show(context);
+              if (timer != null) {
+                context
+                    .bloc<CurrentTimerBloc>()
+                    .add(CurrentTimerSelected(timer));
+              }
+            },
+          );
+        } else {
+          return IconButton(
+            icon: Icon(Icons.list),
+            onPressed: null,
+          );
+        }
+      },
+    );
+  }
+
   Widget playPauseButton() {
     return BlocListener<TimerBloc, TimerState>(
       listener: (context, state) {
-        if (state is TimerInitial) {
-          _controller.reverse();
-        } else if (state is TimerReady) {
-          _controller.reverse();
-        } else if (state is TimerRunning) {
+        if (state is TimerRunning) {
           _controller.forward();
-        } else if (state is TimerPause) {
-          _controller.reverse();
-        } else if (state is TimerFinish) {
-          _controller.reverse();
-        } else if (state is TimerFailure) {
+        } else {
           _controller.reverse();
         }
       },
@@ -302,7 +328,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           } else if (currentState is TimerReady) {
             context.bloc<TimerBloc>().add(TimerStarted());
           } else if (currentState is TimerPause) {
-            ForegroundService.resume();
             context.bloc<TimerBloc>().add(TimerResumed());
           } else if (currentState is TimerFinish) {
             context.bloc<TimerBloc>().add(TimerStarted());

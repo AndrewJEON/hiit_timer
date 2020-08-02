@@ -1,30 +1,25 @@
 part of 'preset_bloc.dart';
 
 abstract class PresetState extends Equatable {
-  final List<TimerModel> timers;
-
-  PresetState(this.timers);
-
   @override
-  List<Object> get props => [timers];
+  List<Object> get props => [];
 }
 
-class PresetInitial extends PresetState {
-  PresetInitial() : super(null);
-}
-
-class PresetLoadInProgress extends PresetState {
-  PresetLoadInProgress() : super(null);
-}
+class PresetLoadInProgress extends PresetState {}
 
 class PresetSuccess extends PresetState {
-  PresetSuccess(List<TimerModel> timers) : super(timers);
+  final List<TimerModel> timers;
+
+  PresetSuccess({
+    @required this.timers,
+  });
+
+  @override
+  List<Object> get props => [...timers];
 }
 
 class PresetFailure extends PresetState {
   final String message;
 
-  PresetFailure.unexpected()
-      : message = 'Oops! Something went wrong',
-        super(null);
+  PresetFailure.unexpected() : message = 'Oops! Something went wrong';
 }

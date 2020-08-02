@@ -20,7 +20,7 @@ class TimerModel extends Equatable {
             timers: [
               TimerPieceModel(
                 duration: Duration(seconds: 5),
-                description: 'Ready',
+                tts: 'Ready',
               ),
             ],
             repeatCount: 1,
@@ -29,11 +29,11 @@ class TimerModel extends Equatable {
             timers: [
               TimerPieceModel(
                 duration: Duration(seconds: 20),
-                description: 'Work',
+                tts: 'Work',
               ),
               TimerPieceModel(
                 duration: Duration(seconds: 5),
-                description: 'Rest',
+                tts: 'Rest',
               ),
             ],
             repeatCount: 3,

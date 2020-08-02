@@ -1,16 +1,16 @@
 import 'package:equatable/equatable.dart';
 
 class TimerPieceModel extends Equatable {
-  final String description;
+  final String tts;
   final Duration duration;
 
   TimerPieceModel({
-    this.description,
+    this.tts,
     this.duration,
   });
 
   TimerPieceModel.initial()
-      : description = 'Work',
+      : tts = 'Work',
         duration = const Duration(seconds: 30);
 
   TimerPieceModel copyWith({
@@ -18,20 +18,20 @@ class TimerPieceModel extends Equatable {
     Duration duration,
   }) {
     return TimerPieceModel(
-      description: description ?? this.description,
+      tts: description ?? this.tts,
       duration: duration ?? this.duration,
     );
   }
 
   TimerPieceModel.fromJson(Map<String, dynamic> json)
-      : description = json['description'],
+      : tts = json['description'],
         duration = Duration(seconds: json['duration']);
 
   Map<String, dynamic> toJson() => {
-        'description': description,
+        'description': tts,
         'duration': duration.inSeconds,
       };
 
   @override
-  List<Object> get props => [description, duration];
+  List<Object> get props => [tts, duration];
 }

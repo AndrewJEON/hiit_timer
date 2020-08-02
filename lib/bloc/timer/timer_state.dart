@@ -2,31 +2,25 @@ part of 'timer_bloc.dart';
 
 abstract class TimerState extends Equatable {
   final Duration remainingTime;
-  final String name;
   final String tts;
 
   TimerState({
     this.remainingTime,
-    this.name,
     this.tts,
   });
 
   @override
-  List<Object> get props => [remainingTime, name, tts];
+  List<Object> get props => [remainingTime, tts];
 }
 
-class TimerInitial extends TimerState {
-  TimerInitial();
-}
+class TimerLoadInProgress extends TimerState {}
 
 class TimerReady extends TimerState {
   TimerReady({
     Duration remainingTime,
-    String name,
     String tts,
   }) : super(
           remainingTime: remainingTime,
-          name: name,
           tts: tts,
         );
 }
@@ -34,11 +28,9 @@ class TimerReady extends TimerState {
 class TimerRunning extends TimerState {
   TimerRunning({
     Duration remainingTime,
-    String name,
     String tts,
   }) : super(
           remainingTime: remainingTime,
-          name: name,
           tts: tts,
         );
 }
@@ -46,23 +38,17 @@ class TimerRunning extends TimerState {
 class TimerPause extends TimerState {
   TimerPause({
     Duration remainingTime,
-    String name,
     String tts,
   }) : super(
           remainingTime: remainingTime,
-          name: name,
           tts: tts,
         );
 }
 
 class TimerFinish extends TimerState {
   TimerFinish({
-    String name,
     String tts,
-  }) : super(
-          name: name,
-          tts: tts,
-        );
+  }) : super(tts: tts);
 }
 
 class TimerFailure extends TimerState {

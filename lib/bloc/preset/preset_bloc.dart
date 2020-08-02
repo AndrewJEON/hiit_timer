@@ -6,20 +6,19 @@ import 'package:flutter/material.dart';
 
 import '../../data/models/model_timer.dart';
 import '../../data/repositories/repository_timer.dart';
-import '../timer/timer_bloc.dart';
+import '../current_timer/current_timer_bloc.dart';
 
 part 'preset_event.dart';
-
 part 'preset_state.dart';
 
 class PresetBloc extends Bloc<PresetEvent, PresetState> {
   final TimerRepository repository;
-  final TimerBloc timerBloc;
+  final CurrentTimerBloc currentTimerBloc;
 
   PresetBloc({
-    this.repository,
-    this.timerBloc,
-  }) : super(PresetInitial()) {
+    @required this.repository,
+    @required this.currentTimerBloc,
+  }) : super(PresetLoadInProgress()) {
     add(PresetInitialized());
   }
 
@@ -52,38 +51,48 @@ class PresetBloc extends Bloc<PresetEvent, PresetState> {
   ) async* {
     yield PresetLoadInProgress();
     final timers = await repository.load();
-    yield PresetSuccess(timers);
+    yield PresetSuccess(timers: timers);
   }
 
   Stream<PresetState> _mapPresetCopiedToState(
     PresetCopied event,
   ) async* {
-    var suffix = ' - Copied';
-    var suffixIndex = 1;
-    while (await repository.isDuplicate(event.timer.name + suffix)) {
-      suffixIndex++;
-      suffix = ' - Copied$suffixIndex';
+    final currentState = state;
+    if (currentState is PresetSuccess) {
+      var suffix = ' - Copied';
+      var suffixIndex = 1;
+      while (await repository.isDuplicate(event.targetTimer.name + suffix)) {
+        suffixIndex++;
+        suffix = ' - Copied$suffixIndex';
+      }
+
+      final newTimer =
+          event.targetTimer.copyWith(name: event.targetTimer.name + suffix);
+      final newTimers = List.of(currentState.timers)..add(newTimer);
+      yield PresetSuccess(timers: newTimers);
+      await repository.save(newTimer);
     }
-    final newTimer = event.timer.copyWith(name: event.timer.name + suffix);
-    final newTimers = List.of(state.timers)..add(newTimer);
-    yield PresetSuccess(newTimers);
-    await repository.save(newTimer);
   }
 
   Stream<PresetState> _mapPresetDeletedToState(
     PresetDeleted event,
   ) async* {
-    final newTimers = List.of(state.timers)
-      ..removeWhere((timer) => timer.name == event.timer.name);
-    yield PresetSuccess(newTimers);
-    await repository.delete(event.timer);
-    if (timerBloc.currentTimer.name == event.timer.name) {
-      final timers = (await repository.load())
-        ..sort((a, b) => a.name.compareTo(b.name));
-      if (timers.isNotEmpty) {
-        timerBloc.add(TimerSelected(timers[0]));
-      } else {
-        timerBloc.add(TimerSelected(null));
+    final currentState = state;
+    if (currentState is PresetSuccess) {
+      final newTimers = List.of(currentState.timers)
+        ..removeWhere((timer) => timer == event.targetTimer);
+      yield PresetSuccess(timers: newTimers);
+      await repository.delete(event.targetTimer);
+
+      final selected = currentTimerBloc.state;
+      if (selected == event.targetTimer) {
+        final timers = (await repository.load())
+          ..sort((a, b) => a.name.compareTo(b.name));
+        if (timers.isNotEmpty) {
+          currentTimerBloc.add(CurrentTimerSelected(timers[0]));
+        } else {
+          currentTimerBloc.add(CurrentTimerSelected(null));
+        }
       }
     }
   }
@@ -91,38 +100,55 @@ class PresetBloc extends Bloc<PresetEvent, PresetState> {
   Stream<PresetState> _mapPresetRenamedToState(
     PresetRenamed event,
   ) async* {
-    final newTimer = event.timer.copyWith(name: event.newName);
-    final newTimers = List.of(state.timers)
-      ..removeWhere((timer) => timer.name == event.timer.name)
-      ..add(newTimer);
-    yield PresetSuccess(newTimers);
-    if (timerBloc.currentTimer.name == event.timer.name) {
-      timerBloc.add(TimerSelected(newTimer));
+    final currentState = state;
+    if (currentState is PresetSuccess) {
+      final newTimer = event.oldTimer.copyWith(name: event.newName);
+      final newTimers = List.of(currentState.timers)
+        ..removeWhere((timer) => timer == event.oldTimer)
+        ..add(newTimer);
+      yield PresetSuccess(timers: newTimers);
+
+      final selected = currentTimerBloc.state;
+      if (selected == event.oldTimer) {
+        currentTimerBloc.add(CurrentTimerSelected(newTimer));
+      }
+
+      await repository.rename(event.oldTimer, newName: event.newName);
     }
-    await repository.rename(event.timer, newName: event.newName);
   }
 
   Stream<PresetState> _mapPresetEditedToState(
     PresetEdited event,
   ) async* {
-    final newTimers = List.of(state.timers)
-      ..removeWhere((timer) => timer.name == event.timer.name)
-      ..add(event.timer);
-    yield PresetSuccess(newTimers);
-    if (timerBloc.currentTimer.name == event.timer.name) {
-      timerBloc.add(TimerSelected(event.timer));
+    final currentState = state;
+    if (currentState is PresetSuccess) {
+      final newTimers = List.of(currentState.timers)
+        ..removeWhere((timer) => timer == event.oldTimer)
+        ..add(event.newTimer);
+      yield PresetSuccess(timers: newTimers);
+
+      final selected = currentTimerBloc.state;
+      if (selected == event.oldTimer) {
+        currentTimerBloc.add(CurrentTimerSelected(event.newTimer));
+      }
+
+      await repository.save(event.newTimer);
     }
-    await repository.save(event.timer);
   }
 
   Stream<PresetState> _mapPresetCreatedToState(
     PresetCreated event,
   ) async* {
-    final newTimers = List.of(state.timers)..add(event.timer);
-    yield PresetSuccess(newTimers);
-    await repository.save(event.timer);
-    if (timerBloc.currentTimer == null) {
-      timerBloc.add(TimerSelected(event.timer));
+    final currentState = state;
+    if (currentState is PresetSuccess) {
+      final newTimers = List.of(currentState.timers)..add(event.newTimer);
+      yield PresetSuccess(timers: newTimers);
+
+      if (currentTimerBloc.state == null) {
+        currentTimerBloc.add(CurrentTimerSelected(event.newTimer));
+      }
+
+      await repository.save(event.newTimer);
     }
   }
 }

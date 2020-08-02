@@ -54,7 +54,7 @@ class _TimerViewState extends State<TimerView> {
         .remainder(60)
         .toString()
         .padLeft(2, '0');
-    _ttsController.text = widget.timer.description;
+    _ttsController.text = widget.timer.tts;
 
     _hourFocusNode.addListener(() {
       if (_hourFocusNode.hasFocus) {

@@ -101,12 +101,14 @@ class MainActivity : FlutterActivity() {
                         val duration = call.argument<Int>("forwardDuration")!!
                         service.forward(duration)
                     }
+                    result.success(true)
                 }
                 "rewind" -> {
                     if (isBound) {
                         val duration = call.argument<Int>("rewindDuration")!!
                         service.rewind(duration)
                     }
+                    result.success(true)
                 }
                 else -> {
                     result.notImplemented()

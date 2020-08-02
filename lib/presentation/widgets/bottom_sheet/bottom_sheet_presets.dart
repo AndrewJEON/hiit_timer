@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../bloc/current_timer/current_timer_bloc.dart';
 import '../../../bloc/preset/preset_bloc.dart';
-import '../../../bloc/timer/timer_bloc.dart';
 import '../../../bloc/timer_creating/timer_creating_bloc.dart';
 import '../../../core/service_locator.dart';
 import '../../../data/models/model_timer.dart';
@@ -42,9 +42,7 @@ class PresetsBottomSheet extends StatelessWidget {
         Expanded(
           child: BlocBuilder<PresetBloc, PresetState>(
             builder: (context, state) {
-              if (state is PresetInitial) {
-                return Container();
-              } else if (state is PresetLoadInProgress) {
+              if (state is PresetLoadInProgress) {
                 return Center(child: CircularProgressIndicator());
               } else if (state is PresetSuccess) {
                 if (state.timers.isEmpty) {
@@ -55,24 +53,30 @@ class PresetsBottomSheet extends StatelessWidget {
                   return ListView.builder(
                     itemCount: sorted.length,
                     itemBuilder: (context, i) {
-                      return ListTile(
-                        onTap: () {
-                          Navigator.pop(context, sorted[i]);
+                      return BlocBuilder<CurrentTimerBloc, TimerModel>(
+                        builder: (context, state) {
+                          if (state != null) {
+                            return ListTile(
+                              onTap: () {
+                                Navigator.pop(context, sorted[i]);
+                              },
+                              leading: Icon(Icons.timer),
+                              title: Text(sorted[i].name),
+                              trailing: options(context, sorted[i]),
+                              selected: state == sorted[i],
+                            );
+                          } else {
+                            return Container();
+                          }
                         },
-                        leading: Icon(Icons.timer),
-                        title: Text(sorted[i].name),
-                        trailing: options(context, sorted[i]),
-                        selected:
-                            sorted[i] == context.bloc<TimerBloc>().currentTimer,
                       );
                     },
                   );
                 }
               } else if (state is PresetFailure) {
                 return Center(child: Text(state.message));
-              } else {
-                return Container();
               }
+              throw Exception('PresetBloc Invalid State');
             },
           ),
         ),
@@ -124,7 +128,7 @@ class PresetsBottomSheet extends StatelessWidget {
             if (newName != null) {
               context
                   .bloc<PresetBloc>()
-                  .add(PresetRenamed(timer, newName: newName));
+                  .add(PresetRenamed(oldTimer: timer, newName: newName));
             }
             break;
           case PresetOptions.edit:
@@ -141,7 +145,9 @@ class PresetsBottomSheet extends StatelessWidget {
               ),
             );
             if (edited != null) {
-              context.bloc<PresetBloc>().add(PresetEdited(edited));
+              context
+                  .bloc<PresetBloc>()
+                  .add(PresetEdited(oldTimer: timer, newTimer: edited));
             }
             break;
           default:

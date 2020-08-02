@@ -1,42 +1,63 @@
 part of 'preset_bloc.dart';
 
 abstract class PresetEvent extends Equatable {
-  final TimerModel timer;
-
-  PresetEvent(this.timer);
+  const PresetEvent();
 
   @override
-  List<Object> get props => [timer];
+  List<Object> get props => [];
 }
 
-class PresetInitialized extends PresetEvent {
-  PresetInitialized() : super(null);
-}
+class PresetInitialized extends PresetEvent {}
 
 class PresetCopied extends PresetEvent {
-  PresetCopied(TimerModel timer) : super(timer);
+  final TimerModel targetTimer;
+
+  PresetCopied(this.targetTimer);
+
+  @override
+  List<Object> get props => [targetTimer];
 }
 
 class PresetDeleted extends PresetEvent {
-  PresetDeleted(TimerModel timer) : super(timer);
+  final TimerModel targetTimer;
+
+  PresetDeleted(this.targetTimer);
+
+  @override
+  List<Object> get props => [targetTimer];
 }
 
 class PresetRenamed extends PresetEvent {
+  final TimerModel oldTimer;
   final String newName;
 
-  PresetRenamed(
-    TimerModel timer, {
+  PresetRenamed({
+    @required this.oldTimer,
     @required this.newName,
-  }) : super(timer);
+  });
 
   @override
-  List<Object> get props => [timer, newName];
+  List<Object> get props => [oldTimer, newName];
 }
 
 class PresetEdited extends PresetEvent {
-  PresetEdited(TimerModel timer) : super(timer);
+  final TimerModel oldTimer;
+  final TimerModel newTimer;
+
+  PresetEdited({
+    @required this.oldTimer,
+    @required this.newTimer,
+  });
+
+  @override
+  List<Object> get props => [oldTimer, newTimer];
 }
 
 class PresetCreated extends PresetEvent {
-  PresetCreated(TimerModel timer) : super(timer);
+  final TimerModel newTimer;
+
+  PresetCreated(this.newTimer);
+
+  @override
+  List<Object> get props => [newTimer];
 }
