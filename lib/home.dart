@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -6,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'bloc/current_timer/current_timer_bloc.dart';
 import 'bloc/repeat_count/repeat_count_bloc.dart';
 import 'bloc/timer/timer_bloc.dart';
+import 'core/admob_ads.dart';
 import 'core/prefs_keys.dart';
 import 'core/service_locator.dart';
 import 'core/utils.dart';
@@ -22,6 +26,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   AnimationController _controller;
+  StreamSubscription _subscription;
 
   @override
   void initState() {
@@ -38,10 +43,19 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 250),
     );
+
+    _subscription = Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult result) {
+      if (result != ConnectivityResult.none) {
+        interstitialAd.load();
+      }
+    });
   }
 
   @override
   void dispose() {
+    _subscription.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -63,7 +77,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   ),
                   Flexible(child: timerName()),
                   SizedBox(
-                    width: 100 ,
+                    width: 100,
                     child: resetButton(),
                   ),
                 ],
@@ -238,6 +252,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         } else {
           return FlatButton.icon(
             onPressed: () {
+              showInterstitialAd();
               context.bloc<TimerBloc>().add(TimerReset());
             },
             icon: Icon(Icons.refresh),

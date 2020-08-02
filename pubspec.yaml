@@ -7,7 +7,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  admob_flutter: ^1.0.0-beta.5
   app_review: ^1.1.2
+  connectivity: '>=0.4.9 <2.0.0'
   equatable: ^1.2.2
   firebase_analytics: ^5.0.16
   firebase_core: ^0.4.5

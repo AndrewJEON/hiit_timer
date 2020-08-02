@@ -9,6 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/admob_ads.dart';
 import '../../core/prefs_keys.dart';
 import '../../core/service_locator.dart';
 import '../../data/models/model_timer.dart';
@@ -107,6 +108,8 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
       } else {
         yield TimerFailure.noSavedTimer();
       }
+    } else {
+      showInterstitialAd();
     }
   }
 

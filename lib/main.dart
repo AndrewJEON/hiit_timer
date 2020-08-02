@@ -1,3 +1,4 @@
+import 'package:admob_flutter/admob_flutter.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +7,7 @@ import 'bloc/current_timer/current_timer_bloc.dart';
 import 'bloc/preset/preset_bloc.dart';
 import 'bloc/repeat_count/repeat_count_bloc.dart';
 import 'bloc/timer/timer_bloc.dart';
+import 'core/admob_ads.dart';
 import 'core/service_locator.dart';
 import 'data/repositories/repository_timer.dart';
 import 'home.dart';
@@ -14,6 +16,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Crashlytics.instance.enableInDevMode = true;
   FlutterError.onError = Crashlytics.instance.recordFlutterError;
+  Admob.initialize(testDeviceIds: ['6AD57F922642FD63F774D9F1A84879B2']);
+  interstitialAd.load();
   await initServiceLocator();
   final currentTimerBloc = CurrentTimerBloc(repository: sl<TimerRepository>());
   final repeatCountBloc = RepeatCountBloc();
