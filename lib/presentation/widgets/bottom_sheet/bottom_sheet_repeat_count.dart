@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gradients/flutter_gradients.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
 class RepeatCountBottomSheet extends StatefulWidget {
@@ -60,8 +61,20 @@ class _RepeatCountBottomSheetState extends State<RepeatCountBottomSheet> {
                     onPressed: () {
                       Navigator.pop(context, _repeatCount);
                     },
-                    child: Text('Done'),
-                    color: Theme.of(context).primaryColor,
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        gradient: FlutterGradients.octoberSilence(),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Container(
+                        constraints:
+                            BoxConstraints(minWidth: 88, minHeight: 36),
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text('Done'),
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(0),
                     textColor: Colors.white,
                   ),
                 ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gradients/flutter_gradients.dart';
 
 import '../../../bloc/current_timer/current_timer_bloc.dart';
 import '../../../bloc/preset/preset_bloc.dart';
@@ -85,7 +86,7 @@ class PresetsBottomSheet extends StatelessWidget {
   }
 
   Widget createNewTimerButton(BuildContext context) {
-    return FlatButton.icon(
+    return FlatButton(
       onPressed: () async {
         final timer = await Navigator.push(
           context,
@@ -102,9 +103,25 @@ class PresetsBottomSheet extends StatelessWidget {
           context.bloc<PresetBloc>().add(PresetCreated(timer));
         }
       },
-      icon: Icon(Icons.add),
-      label: Text('New Timer'),
-      color: Theme.of(context).primaryColor,
+      child: Ink(
+        decoration: BoxDecoration(
+          gradient: FlutterGradients.octoberSilence(),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          constraints: BoxConstraints(minWidth: 88, minHeight: 36),
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.add),
+              SizedBox(width: 8),
+              Text('New Timer'),
+            ],
+          ),
+        ),
+      ),
+      padding: const EdgeInsets.all(0),
       textColor: Colors.white,
     );
   }

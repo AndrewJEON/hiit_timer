@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gradients/flutter_gradients.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -101,7 +102,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           FloatingActionButton(
             heroTag: 'fast_rewind',
             mini: true,
-            child: Icon(Icons.fast_rewind, size: 20),
+            child: Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                gradient: FlutterGradients.octoberSilence(),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.fast_rewind, size: 20),
+            ),
             onPressed: () {
               context.bloc<TimerBloc>().add(TimerRewound());
             },
@@ -110,7 +118,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           FloatingActionButton(
             heroTag: 'fast_forward',
             mini: true,
-            child: Icon(Icons.fast_forward, size: 20),
+            child: Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                gradient: FlutterGradients.octoberSilence(),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.fast_forward, size: 20),
+            ),
             onPressed: () {
               context.bloc<TimerBloc>().add(TimerForwarded());
             },
@@ -332,9 +347,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       },
       child: FloatingActionButton(
         heroTag: 'play_pause',
-        child: AnimatedIcon(
-          icon: AnimatedIcons.play_pause,
-          progress: _controller,
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: FlutterGradients.octoberSilence(),
+            shape: BoxShape.circle,
+          ),
+          child: AnimatedIcon(
+            icon: AnimatedIcons.play_pause,
+            progress: _controller,
+          ),
         ),
         onPressed: () {
           final currentState = context.bloc<TimerBloc>().state;

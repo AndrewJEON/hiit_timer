@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gradients/flutter_gradients.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -48,7 +49,7 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              FlatButton.icon(
+              FlatButton(
                 onPressed: () async {
                   final params = Uri(
                     scheme: 'mailto',
@@ -60,8 +61,27 @@ class _SettingsBottomSheetState extends State<SettingsBottomSheet> {
                     Fluttertoast.showToast(msg: 'Cannot send email');
                   }
                 },
-                icon: Icon(Icons.email, color: Theme.of(context).primaryColor),
-                label: Text('Feedback'),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    gradient: FlutterGradients.octoberSilence(),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Container(
+                    alignment: Alignment.center,
+                    constraints: BoxConstraints(minWidth: 88, minHeight: 36),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Icon(Icons.email),
+                        SizedBox(width: 8),
+                        Text('Feedback'),
+                      ],
+                    ),
+                  ),
+                ),
+                padding: const EdgeInsets.all(0),
+                textColor: Colors.white,
               ),
             ],
           ),

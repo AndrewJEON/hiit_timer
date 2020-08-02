@@ -54,8 +54,8 @@ class MyApp extends StatelessWidget {
 
   ThemeData theme(BuildContext context) {
     return ThemeData(
-      primaryColor: Colors.deepOrange[400],
-      accentColor: Colors.deepOrange[400],
+      primaryColor: Color(0xff5859e4),
+      accentColor: Color(0xff5859e4),
       appBarTheme: AppBarTheme(
         color: Colors.transparent,
         elevation: 0,
