@@ -19,6 +19,7 @@ import '../current_timer/current_timer_bloc.dart';
 import '../repeat_count/repeat_count_bloc.dart';
 
 part 'timer_event.dart';
+
 part 'timer_state.dart';
 
 class TimerBloc extends Bloc<TimerEvent, TimerState> {
@@ -99,7 +100,9 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   Stream<TimerState> _mapTimerInitializedToState(
     TimerInitialized event,
   ) async* {
-    if (state is! TimerRunning && state is! TimerPause) {
+    if (state is! TimerRunning &&
+        state is! TimerPause &&
+        state is! TimerFinish) {
       if (event.timer != null) {
         yield TimerReady(
           remainingTime: event.timer.timerSets[0].timers[0].duration,
